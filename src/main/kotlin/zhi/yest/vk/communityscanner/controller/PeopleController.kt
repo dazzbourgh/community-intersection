@@ -48,7 +48,7 @@ class PeopleController(private val groupService: GroupService) {
                     request.peopleFilters
                             ?.entries
                             ?.map { user.sex == it.value }
-                            ?.all { it } ?: false
+                            ?.all { it } ?: true
                 }
     }
 }

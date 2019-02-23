@@ -4,6 +4,8 @@ data class User(val id: Int,
                 val name: String,
                 val surname: String,
                 val sex: String,
+                val photo: String,
+                val city: String,
                 val link: String = """https://vk.com/id$id""") {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

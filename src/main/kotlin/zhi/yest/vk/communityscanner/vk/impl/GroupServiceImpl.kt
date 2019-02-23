@@ -36,14 +36,16 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                         "count" to count.toString(),
                         "offset" to (offset * THRESHOLD).toString(),
                         "group_id" to groupId.toString(),
-                        "fields" to "sex"
+                        "fields" to "sex,photo_400_orig,city"
                 ))["response"]["items"]
                 .asSequence()
                 .map { value ->
                     User(value["id"].asInt(),
-                            value["first_name"].toString(),
-                            value["last_name"].toString(),
-                            value["sex"].toString())
+                            value["first_name"].toString().replace("'", ""),
+                            value["last_name"].toString().replace("'", ""),
+                            value["sex"].toString(),
+                            value["photo_400_orig"]?.toString()?.replace("'", "") ?: "no photo",
+                            value["city"]?.get("title")?.toString()?.replace("'", "") ?: "unknown")
                 }
     }
 }

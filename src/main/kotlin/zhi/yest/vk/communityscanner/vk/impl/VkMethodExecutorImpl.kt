@@ -9,7 +9,7 @@ import zhi.yest.vk.communityscanner.vk.VkMethodExecutor
 class VkMethodExecutorImpl : VkMethodExecutor {
     private val restTemplate: RestTemplate = RestTemplate()
     private val version = "5.92"
-    private val accessToken: String = System.getProperty("access_token")
+    private val accessToken: String = System.getProperty("access_token") ?: System.getenv("access_token")
     private val url: String = """https://api.vk.com/method/%s?v=$version&access_token=$accessToken"""
 
     override fun execute(methodName: String, params: Map<String, String>): ObjectNode {

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
 import zhi.yest.vk.communityscanner.domain.Request
 import zhi.yest.vk.communityscanner.domain.User
 import zhi.yest.vk.communityscanner.vk.GroupService
@@ -12,7 +13,7 @@ import zhi.yest.vk.communityscanner.vk.GroupService
 @RequestMapping("people")
 class PeopleController(private val groupService: GroupService) {
     @PostMapping
-    fun getPeople(@RequestBody request: Request): List<User> {
+    fun getPeople(@RequestBody request: Request): Mono<List<User>> {
         /*
             0. Get members count for each community
             1. Use "users.search" for each community to fetch users
@@ -26,31 +27,32 @@ class PeopleController(private val groupService: GroupService) {
                 requests, where N is the amount of users
                 subscribed to all the communities specified in request
          */
-        val interestingUsers = mutableListOf<User>()
-        val usersMap = mutableMapOf<User, Int>()
-        request.communities
+        return request.communities
                 .asSequence()
                 // using distinct since new users may subscribe while batch searching
-                .map { groupService.getMembers(it).distinct() }
-                .forEach { userList ->
-                    userList.forEach {
-                        usersMap.compute(it) { _, value ->
+                .map { groupService.getMembers(it) }
+                .reduce { acc, flux -> acc.concatMap { flux } }
+                .collectList()
+                .map { users ->
+                    val interestingUsers = mutableListOf<User>()
+                    val usersMap = mutableMapOf<User, Int>()
+                    users.forEach { user ->
+                        usersMap.compute(user) { _, value ->
                             if (value == null) 1 else {
                                 if (value + 1 == request.communities.size) {
-                                    interestingUsers.add(it)
+                                    interestingUsers.add(user)
                                 }
                                 value + 1
                             }
                         }
                     }
-                }
-        // TODO: filter by all fields, not only sex
-        return interestingUsers
-                .filter { user ->
-                    request.peopleFilters
-                            ?.entries
-                            ?.map { user.fields[it.key] == it.value }
-                            ?.all { it } ?: true
+                    interestingUsers
+                            .filter { user ->
+                                request.peopleFilters
+                                        ?.entries
+                                        ?.map { user.fields[it.key] == it.value }
+                                        ?.all { it } ?: true
+                            }
                 }
     }
 }

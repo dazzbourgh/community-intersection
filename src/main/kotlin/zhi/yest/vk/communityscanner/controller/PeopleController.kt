@@ -42,6 +42,13 @@ class PeopleController(private val groupService: GroupService) {
                         }
                     }
                 }
+        // TODO: filter by all fields, not only sex
         return interestingUsers
+                .filter { user ->
+                    request.peopleFilters
+                            ?.entries
+                            ?.map { user.sex == it.value }
+                            ?.all { it } ?: false
+                }
     }
 }

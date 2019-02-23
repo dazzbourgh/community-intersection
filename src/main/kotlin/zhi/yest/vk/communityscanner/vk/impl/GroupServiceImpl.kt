@@ -1,6 +1,7 @@
 package zhi.yest.vk.communityscanner.vk.impl
 
 import org.springframework.stereotype.Service
+import zhi.yest.vk.communityscanner.domain.FIELDS
 import zhi.yest.vk.communityscanner.domain.Methods
 import zhi.yest.vk.communityscanner.domain.User
 import zhi.yest.vk.communityscanner.vk.GroupService
@@ -21,7 +22,6 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
         else getUsers(groupId, THRESHOLD).toList()
     }
 
-    // TODO: make it work with list of ids
     private fun getMembersCount(id: Int): Int {
         return vkMethodExecutor.execute(Methods.Groups.GET_BY_ID.toString(),
                 mapOf("group_ids" to id.toString(),
@@ -40,12 +40,15 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                 ))["response"]["items"]
                 .asSequence()
                 .map { value ->
-                    User(value["id"].asInt(),
-                            value["first_name"].toString().replace("'", ""),
-                            value["last_name"].toString().replace("'", ""),
-                            value["sex"].toString(),
-                            value["photo_400_orig"]?.toString()?.replace("'", "") ?: "no photo",
-                            value["city"]?.get("title")?.toString()?.replace("'", "") ?: "unknown")
+                    val user = User(value["id"].asInt())
+                    FIELDS.forEach { field ->
+                        value[field]
+                                ?.let { it["title"] ?: it }
+                                ?.toString()
+                                ?.also { user.fields[field] = it }
+
+                    }
+                    user
                 }
     }
 }

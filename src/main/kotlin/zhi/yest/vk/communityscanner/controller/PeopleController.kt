@@ -30,7 +30,9 @@ class PeopleController(private val groupService: GroupService) {
         val usersMap = mutableMapOf<User, Int>()
         request.communities
                 .asSequence()
-                .map { groupService.getMembers(it) }.forEach { userList ->
+                // using distinct since new users may subscribe while batch searching
+                .map { groupService.getMembers(it).distinct() }
+                .forEach { userList ->
                     userList.forEach {
                         usersMap.compute(it) { _, value ->
                             if (value == null) 1 else {
@@ -47,7 +49,7 @@ class PeopleController(private val groupService: GroupService) {
                 .filter { user ->
                     request.peopleFilters
                             ?.entries
-                            ?.map { user.sex == it.value }
+                            ?.map { user.fields[it.key] == it.value }
                             ?.all { it } ?: true
                 }
     }

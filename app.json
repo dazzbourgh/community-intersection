@@ -1,0 +1,5 @@
+{
+  "name": "Friend Finder",
+  "description": "Gradle back end app to find friends in VK based on shared communities",
+  "image": "heroku/gradle"
+}

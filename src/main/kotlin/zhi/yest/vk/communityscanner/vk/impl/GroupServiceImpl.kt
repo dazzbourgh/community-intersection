@@ -1,6 +1,10 @@
 package zhi.yest.vk.communityscanner.vk.impl
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
 import zhi.yest.vk.communityscanner.domain.FIELDS
 import zhi.yest.vk.communityscanner.domain.Methods
 import zhi.yest.vk.communityscanner.domain.User
@@ -11,26 +15,47 @@ private const val THRESHOLD = 1000
 
 @Service
 class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupService {
-    override fun getMembers(groupId: Int): List<User> {
-        val membersCount = getMembersCount(groupId)
+    override fun getMembers(groupId: Int): Flux<User> {
+        val membersCount = 121 //getMembersCount(groupId)
         val loops = membersCount / THRESHOLD
         val remainder = if (membersCount > THRESHOLD) membersCount % THRESHOLD else 0
-        return if (loops > 0) ((0 until loops)
-                .asSequence()
-                .flatMap { getUsers(groupId, THRESHOLD, it) } + getUsers(groupId, remainder, loops))
-                .toList()
-        else getUsers(groupId, THRESHOLD).toList()
+        val userJsonsFlux = when {
+            loops > 0 -> (0 until loops)
+                    .asSequence()
+                    .map { getUserJsons(groupId, THRESHOLD, it) }
+                    .map { it.toFlux() }
+                    .reduce { acc, flux -> acc.concatWith(flux) }
+                    .let { it.concatWith(getUserJsons(groupId, remainder, loops)) }
+            else -> getUserJsons(groupId, THRESHOLD)
+        }.toFlux()
+        return userJsonsFlux
+                .flatMapIterable { objectNode ->
+                    objectNode["response"]["items"]
+                            .asSequence()
+                            .map { value ->
+                                val user = User(value["id"].asInt())
+                                FIELDS.forEach { field ->
+                                    value[field]
+                                            ?.let { it["title"] ?: it }
+                                            ?.toString()
+                                            ?.also { user.fields[field] = it }
+
+                                }
+                                user
+                            }.asIterable()
+                }
     }
 
     private fun getMembersCount(id: Int): Int {
         return vkMethodExecutor.execute(Methods.Groups.GET_BY_ID.toString(),
                 mapOf("group_ids" to id.toString(),
-                        "fields" to "members_count"))["response"][0]["members_count"]
+                        "fields" to "members_count"))
+                .block()!!["response"][0]["members_count"]
                 .asInt()
     }
 
-    private fun getUsers(groupId: Int, count: Int, offset: Int = 0): Sequence<User> {
-        if (count == 0) return emptySequence()
+    private fun getUserJsons(groupId: Int, count: Int, offset: Int = 0): Mono<ObjectNode> {
+        if (count == 0) return Mono.empty()
         return vkMethodExecutor.execute(Methods.Groups.GET_MEMBERS.toString(),
                 mapOf(
                         "count" to count.toString(),
@@ -50,5 +75,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                     }
                     user
                 }
+                        "fields" to "sex,photo_400_orig,city"
+                ))
     }
 }

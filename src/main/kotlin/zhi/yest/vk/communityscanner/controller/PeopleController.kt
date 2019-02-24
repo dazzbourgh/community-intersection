@@ -13,19 +13,6 @@ import zhi.yest.vk.communityscanner.vk.GroupService
 class PeopleController(private val groupService: GroupService) {
     @PostMapping
     fun getPeople(@RequestBody request: Request): List<User> {
-        /*
-            0. Get members count for each community
-            1. Use "users.search" for each community to fetch users
-                and leverage "fields" param to filter
-            2. Find users that exist in every community
-            3. For each user get list of interesting pages and check if
-                specific communities are above the bottom threshold
-
-                A total of
-                sum(Ci / 1000 * count) + N
-                requests, where N is the amount of users
-                subscribed to all the communities specified in request
-         */
         val interestingUsers = mutableListOf<User>()
         val usersMap = mutableMapOf<User, Int>()
         request.communities
@@ -33,18 +20,12 @@ class PeopleController(private val groupService: GroupService) {
                 // using distinct since new users may subscribe while batch searching
                 .map { groupService.getMembers(it).distinct() }
                 .forEach { userList ->
-                    userList.forEach {
-                        usersMap.compute(it) { _, value ->
-                            if (value == null) 1 else {
-                                if (value + 1 == request.communities.size) {
-                                    interestingUsers.add(it)
-                                }
-                                value + 1
-                            }
-                        }
+                    userList.forEach { user ->
+                        usersMap.computeIfPresent(user) { _, value ->
+                            (value + 1).also { if (it == request.communities.size) interestingUsers.add(user) }
+                        } ?: usersMap.put(user, 1)
                     }
                 }
-        // TODO: filter by all fields, not only sex
         return interestingUsers
                 .filter { user ->
                     request.peopleFilters

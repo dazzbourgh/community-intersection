@@ -36,7 +36,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                         "count" to count.toString(),
                         "offset" to (offset * THRESHOLD).toString(),
                         "group_id" to groupId.toString(),
-                        "fields" to "sex,photo_400_orig,city"
+                        "fields" to FIELDS.filter { it != "first_name" && it != "last_name" }.joinToString()
                 ))["response"]["items"]
                 .asSequence()
                 .map { value ->

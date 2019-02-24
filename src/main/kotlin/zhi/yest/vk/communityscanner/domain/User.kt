@@ -29,4 +29,5 @@ val FIELDS: List<String> = listOf("first_name",
         "last_name",
         "sex",
         "photo_400_orig",
+        "photo_200",
         "city")

@@ -42,7 +42,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
 
                                 }
                                 user
-                            }.toList()
+                            }.asIterable()
                 }
     }
 

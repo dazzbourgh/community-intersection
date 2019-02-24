@@ -13,26 +13,8 @@ import java.util.concurrent.ConcurrentHashMap
 @RestController
 @RequestMapping("people")
 class PeopleController(private val groupService: GroupService) {
-    @PostMapping
-    fun getPeople(@RequestBody request: Request): List<User> {
-        val interestingUsers = mutableListOf<User>()
-        val usersMap = mutableMapOf<User, Int>()
-        request.communities
     @PostMapping(produces = ["application/stream+json"])
     fun getPeople(@RequestBody request: Request): Flux<User> {
-        /*
-            0. Get members count for each community
-            1. Use "users.search" for each community to fetch users
-                and leverage "fields" param to filter
-            2. Find users that exist in every community
-            3. For each user get list of interesting pages and check if
-                specific communities are above the bottom threshold
-
-                A total of
-                sum(Ci / 1000 * count) + N
-                requests, where N is the amount of users
-                subscribed to all the communities specified in request
-         */
         val usersMap: MutableMap<User, Int> = ConcurrentHashMap()
         return request.communities
                 .asSequence()

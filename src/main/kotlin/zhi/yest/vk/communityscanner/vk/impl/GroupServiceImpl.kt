@@ -29,21 +29,24 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
             else -> getUserJsons(groupId, THRESHOLD)
         }.toFlux()
         return userJsonsFlux
-                .flatMapIterable { objectNode ->
-                    objectNode["response"]["items"]
-                            .asSequence()
-                            .map { value ->
-                                val user = User(value["id"].asInt())
-                                FIELDS.forEach { field ->
-                                    value[field]
-                                            ?.let { it["title"] ?: it }
-                                            ?.toString()
-                                            ?.also { user.fields[field] = it }
+                .flatMapIterable { toUserIterable(it) }
+    }
 
-                                }
-                                user
-                            }.asIterable()
-                }
+    private fun toUserIterable(objectNode: ObjectNode): Iterable<User> {
+        return objectNode["response"]["items"]
+                .asSequence()
+                .map { value ->
+                    val user = User(value["id"].asInt())
+                    FIELDS.forEach { field ->
+                        value[field]
+                                // a trick for 'city' field, which is an object instead of string
+                                ?.let { it["title"] ?: it }
+                                ?.toString()
+                                ?.also { user.fields[field] = it }
+
+                    }
+                    user
+                }.asIterable()
     }
 
     private fun getMembersCount(id: Int): Int {
@@ -62,20 +65,6 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                         "offset" to (offset * THRESHOLD).toString(),
                         "group_id" to groupId.toString(),
                         "fields" to FIELDS.filter { it != "first_name" && it != "last_name" }.joinToString()
-                ))["response"]["items"]
-                .asSequence()
-                .map { value ->
-                    val user = User(value["id"].asInt())
-                    FIELDS.forEach { field ->
-                        value[field]
-                                ?.let { it["title"] ?: it }
-                                ?.toString()
-                                ?.also { user.fields[field] = it }
-
-                    }
-                    user
-                }
-                        "fields" to "sex,photo_400_orig,city"
                 ))
     }
 }

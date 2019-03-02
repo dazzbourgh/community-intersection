@@ -18,7 +18,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
     override fun getMembers(groupIds: List<Int>): Flux<User> {
         return getMembersCount(groupIds)
                 .map { groupIds.zip(it).toMap() }
-                .map { getMembersBulk(it) }
+                .map { getMembersIteratively(it) }
                 .toFlux()
                 .flatMap { it }
     }
@@ -30,7 +30,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                 .collectList()
     }
 
-    private fun getMembersBulk(idToUserCountMap: Map<Int, Int>): Flux<User> {
+    private fun getMembersIteratively(idToUserCountMap: Map<Int, Int>): Flux<User> {
         val largestUserCount = idToUserCountMap.values.max()!!
         val iterations = largestUserCount / THRESHOLD
         return ((0 until iterations)

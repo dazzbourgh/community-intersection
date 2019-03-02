@@ -33,7 +33,7 @@ compileKotlin {
 
 task deploy(type: Exec) {
     executable "heroku"
-    args "deploy:jar", "./build/libs/wall-audio-info-fetcher-${version}.jar", "--app", "enigmatic-headland-74720"
+    args "deploy:jar", "./build/libs/community-scanner-${version}.jar", "--app", "friend-finder-be"
 }
 
 deploy.dependsOn(build)

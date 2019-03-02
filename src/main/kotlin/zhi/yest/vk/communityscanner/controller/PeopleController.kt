@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import zhi.yest.vk.communityscanner.domain.Request
 import zhi.yest.vk.communityscanner.domain.User
+import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
 import zhi.yest.vk.communityscanner.processing.filterByFields
+import zhi.yest.vk.communityscanner.processing.filterFaceless
 import zhi.yest.vk.communityscanner.processing.findInteresting
 import zhi.yest.vk.communityscanner.vk.GroupService
 
@@ -15,9 +17,10 @@ import zhi.yest.vk.communityscanner.vk.GroupService
 @RequestMapping("people")
 class PeopleController(private val groupService: GroupService) {
     @PostMapping(produces = ["application/stream+json"])
-    fun getPeople(@RequestBody request: Request): Flux<User> {
+    fun getPeople(@RequestBody request: Request): Flux<DownloadableDataDto<User>> {
         return groupService.getMembers(request.communities)
                 .findInteresting(request.communities.size)
                 .filterByFields { request.peopleFilters }
+                .filterFaceless()
     }
 }

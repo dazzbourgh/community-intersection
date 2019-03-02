@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import zhi.yest.vk.communityscanner.domain.FIELDS
 import zhi.yest.vk.communityscanner.domain.User
+import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
 import zhi.yest.vk.communityscanner.vk.GroupService
 import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
@@ -15,7 +16,7 @@ private const val THRESHOLD = 1000
 
 @Service
 class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupService {
-    override fun getMembers(groupIds: List<Int>): Flux<User> {
+    override fun getMembers(groupIds: List<Int>): Flux<DownloadableDataDto<User>> {
         return getMembersCount(groupIds)
                 .map { groupIds.zip(it).toMap() }
                 .map { getMembersIteratively(it) }
@@ -30,18 +31,18 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                 .collectList()
     }
 
-    private fun getMembersIteratively(idToUserCountMap: Map<Int, Int>): Flux<User> {
+    private fun getMembersIteratively(idToUserCountMap: Map<Int, Int>): Flux<DownloadableDataDto<User>> {
         val largestUserCount = idToUserCountMap.values.max()!!
         val iterations = largestUserCount / THRESHOLD
         return ((0 until iterations)
                 .map { iteration ->
-                    getUsersForEachCommunity(idToUserCountMap, iteration * THRESHOLD)
-                } + getUsersForEachCommunity(idToUserCountMap, iterations * THRESHOLD))
+                    getUsersForEachCommunity(idToUserCountMap, iteration * THRESHOLD, largestUserCount)
+                } + getUsersForEachCommunity(idToUserCountMap, iterations * THRESHOLD, largestUserCount))
                 .reduce { acc, flux -> acc.concatWith(flux) }
-                .flatMapIterable { toUserIterable(it) }
+                .flatMapIterable { toUserDtoIterable(it) }
     }
 
-    private fun getUsersForEachCommunity(idToUserCountMap: Map<Int, Int>, alreadyFetched: Int): Flux<ObjectNode> {
+    private fun getUsersForEachCommunity(idToUserCountMap: Map<Int, Int>, alreadyFetched: Int, largestUserCount: Int): Flux<DownloadableDataDto<ObjectNode>> {
         return (0 until idToUserCountMap.size)
                 .asSequence()
                 .map { idToUserCountMap.keys.toList()[it] }
@@ -49,19 +50,20 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                 .map { getUserJsons(it, THRESHOLD, alreadyFetched) }
                 .map { it.toFlux() }
                 .reduce { a, b -> a.concatWith(b) }
+                .map { DownloadableDataDto(it, ((alreadyFetched.toDouble() / largestUserCount) * 100).toInt()) }
     }
 
-    private fun toUserIterable(objectNode: ObjectNode): Iterable<User> {
-        return objectNode["response"]["items"]
+    private fun toUserDtoIterable(objectNode: DownloadableDataDto<ObjectNode>): Iterable<DownloadableDataDto<User>> {
+        return objectNode.data!!["response"]["items"]
                 .asSequence()
                 .map { value ->
-                    val user = User(value["id"].asInt())
+                    val user = DownloadableDataDto(User(value["id"].asInt()), objectNode.percent)
                     FIELDS.forEach { field ->
                         value[field]
                                 // a trick for 'city' field, which is an object instead of a string
                                 ?.let { it["title"] ?: it }
                                 ?.toString()
-                                ?.also { user.fields[field] = it }
+                                ?.also { user.data!!.fields[field] = it }
                     }
                     user
                 }.asIterable()

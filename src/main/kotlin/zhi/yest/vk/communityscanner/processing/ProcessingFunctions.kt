@@ -3,6 +3,7 @@ package zhi.yest.vk.communityscanner.processing
 import reactor.core.publisher.Flux
 import zhi.yest.vk.communityscanner.domain.User
 import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
+import zhi.yest.vk.communityscanner.util.trimQuotes
 import java.util.concurrent.ConcurrentHashMap
 
 fun Flux<DownloadableDataDto<User>>.findInteresting(communitiesCount: Int, userCountMap: MutableMap<User, Int> = ConcurrentHashMap()): Flux<DownloadableDataDto<User>> {
@@ -20,7 +21,7 @@ fun Flux<DownloadableDataDto<User>>.filterByFields(filterMapSupplier: () -> Map<
                 val filterMap = filterMapSupplier() ?: emptyMap()
                 if (filterMap.isEmpty() || filterMap
                                 .entries
-                                .map { userDto.data!!.fields[it.key] == it.value }
+                                .map { userDto.data!!.fields[it.key] == it.value.trimQuotes() }
                                 .all { it }) userDto else DownloadableDataDto<User>(null, userDto.percent)
             }
 }

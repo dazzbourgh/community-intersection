@@ -8,6 +8,7 @@ import reactor.core.publisher.toFlux
 import zhi.yest.vk.communityscanner.domain.FIELDS
 import zhi.yest.vk.communityscanner.domain.User
 import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
+import zhi.yest.vk.communityscanner.util.trimQuotes
 import zhi.yest.vk.communityscanner.vk.GroupService
 import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
@@ -63,7 +64,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                                 // a trick for 'city' field, which is an object instead of a string
                                 ?.let { it["title"] ?: it }
                                 ?.toString()
-                                ?.also { user.data!!.fields[field] = it }
+                                ?.also { user.data!!.fields[field] = it.trimQuotes() }
                     }
                     user
                 }.asIterable()

@@ -3,11 +3,13 @@ package zhi.yest.vk.communityscanner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.web.reactive.config.CorsRegistry
 import org.springframework.web.reactive.config.WebFluxConfigurer
 import org.springframework.web.reactive.config.WebFluxConfigurerComposite
 
 @SpringBootApplication
+@ComponentScan("zhi.yest")
 class CommunityScannerApplication {
     // Turn off CORS
     @Bean

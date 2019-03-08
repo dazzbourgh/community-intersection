@@ -1,15 +1,15 @@
-package zhi.yest.vk.communityscanner.vk.impl
+package zhi.yest.vk.friendfinder.vk.impl
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
-import zhi.yest.vk.communityscanner.domain.FIELDS
-import zhi.yest.vk.communityscanner.domain.User
-import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
-import zhi.yest.vk.communityscanner.util.trimQuotes
-import zhi.yest.vk.communityscanner.vk.GroupService
+import zhi.yest.vk.friendfinder.domain.FIELDS
+import zhi.yest.vk.friendfinder.domain.User
+import zhi.yest.vk.friendfinder.dto.DownloadableDataDto
+import zhi.yest.vk.friendfinder.util.trimQuotes
+import zhi.yest.vk.friendfinder.vk.GroupService
 import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
 

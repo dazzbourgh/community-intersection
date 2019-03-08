@@ -1,4 +1,4 @@
-package zhi.yest.vk.communityscanner.domain
+package zhi.yest.vk.friendfinder.domain
 
 data class User(val id: Int,
                 val fields: MutableMap<String, String> = mutableMapOf("link" to """https://vk.com/id$id""")) {

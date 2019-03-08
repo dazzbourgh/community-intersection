@@ -1,4 +1,4 @@
-package zhi.yest.vk.communityscanner
+package zhi.yest.vk.friendfinder
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

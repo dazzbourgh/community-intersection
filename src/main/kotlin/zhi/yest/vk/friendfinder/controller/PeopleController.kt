@@ -1,17 +1,17 @@
-package zhi.yest.vk.communityscanner.controller
+package zhi.yest.vk.friendfinder.controller
 
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
-import zhi.yest.vk.communityscanner.domain.Request
-import zhi.yest.vk.communityscanner.domain.User
-import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
-import zhi.yest.vk.communityscanner.processing.filterByFields
-import zhi.yest.vk.communityscanner.processing.filterFaceless
-import zhi.yest.vk.communityscanner.processing.findInteresting
-import zhi.yest.vk.communityscanner.vk.GroupService
+import zhi.yest.vk.friendfinder.domain.Request
+import zhi.yest.vk.friendfinder.domain.User
+import zhi.yest.vk.friendfinder.dto.DownloadableDataDto
+import zhi.yest.vk.friendfinder.processing.filterByFields
+import zhi.yest.vk.friendfinder.processing.filterFaceless
+import zhi.yest.vk.friendfinder.processing.findInteresting
+import zhi.yest.vk.friendfinder.vk.GroupService
 
 @RestController
 @RequestMapping("people")

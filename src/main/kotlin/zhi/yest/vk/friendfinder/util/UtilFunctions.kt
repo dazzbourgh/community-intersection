@@ -1,4 +1,4 @@
-package zhi.yest.vk.communityscanner.util
+package zhi.yest.vk.friendfinder.util
 
 fun String.trimQuotes(): String {
     return this.replace("\"", "")

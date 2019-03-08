@@ -1,9 +1,9 @@
-package zhi.yest.vk.communityscanner.processing
+package zhi.yest.vk.friendfinder.processing
 
 import reactor.core.publisher.Flux
-import zhi.yest.vk.communityscanner.domain.User
-import zhi.yest.vk.communityscanner.dto.DownloadableDataDto
-import zhi.yest.vk.communityscanner.util.trimQuotes
+import zhi.yest.vk.friendfinder.domain.User
+import zhi.yest.vk.friendfinder.dto.DownloadableDataDto
+import zhi.yest.vk.friendfinder.util.trimQuotes
 import java.util.concurrent.ConcurrentHashMap
 
 fun Flux<DownloadableDataDto<User>>.findInteresting(communitiesCount: Int, userCountMap: MutableMap<User, Int> = ConcurrentHashMap()): Flux<DownloadableDataDto<User>> {

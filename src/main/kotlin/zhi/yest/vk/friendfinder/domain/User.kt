@@ -2,13 +2,6 @@ package zhi.yest.vk.friendfinder.domain
 
 data class User(val id: Int,
                 val fields: MutableMap<String, String> = mutableMapOf("link" to """https://vk.com/id$id""")) {
-    /*
-                val name: String,
-                val surname: String,
-                val sex: String,
-                val photo: String,
-                val city: String,
-     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

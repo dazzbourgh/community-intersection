@@ -20,7 +20,7 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
     override fun getMembers(groupIds: List<Int>): Flux<DownloadableDataDto<User>> {
         return getMembersCount(groupIds)
                 .map { groupIds.zip(it).toMap() }
-                .map { getMembersIteratively(it) }
+                .map { getMembersFlux(it) }
                 .toFlux()
                 .flatMap { it }
     }
@@ -32,27 +32,30 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
                 .collectList()
     }
 
-    private fun getMembersIteratively(idToUserCountMap: Map<Int, Int>): Flux<DownloadableDataDto<User>> {
+    private fun getMembersFlux(idToUserCountMap: Map<Int, Int>): Flux<DownloadableDataDto<User>> {
         val largestUserCount = idToUserCountMap.values.max()!!
         val iterations = largestUserCount / THRESHOLD
         return ((0 until iterations)
                 .map { iteration ->
-                    getUsersForEachCommunity(idToUserCountMap, iteration * THRESHOLD, largestUserCount)
-                } + getUsersForEachCommunity(idToUserCountMap, iterations * THRESHOLD, largestUserCount))
+                    getUsersBatch(idToUserCountMap, iteration * THRESHOLD, largestUserCount)
+                } + getUsersBatch(idToUserCountMap, iterations * THRESHOLD, largestUserCount))
                 .reduce { acc, flux -> acc.concatWith(flux) }
                 .flatMapIterable { toUserDtoIterable(it) }
     }
 
-    private fun getUsersForEachCommunity(idToUserCountMap: Map<Int, Int>, alreadyFetched: Int, largestUserCount: Int): Flux<DownloadableDataDto<ObjectNode>> {
+    private fun getUsersBatch(idToUserCountMap: Map<Int, Int>, fetchedAmount: Int, largestUserCount: Int): Flux<DownloadableDataDto<ObjectNode>> {
         return (0 until idToUserCountMap.size)
                 .asSequence()
                 .map { idToUserCountMap.keys.toList()[it] }
-                .filter { idToUserCountMap[it]!! > alreadyFetched }
-                .map { getUserJsons(it, THRESHOLD, alreadyFetched) }
+                .filter { idToUserCountMap[it]!! > fetchedAmount }
+                .map { getUserJsons(it, THRESHOLD, fetchedAmount) }
                 .map { it.toFlux() }
                 .reduce { a, b -> a.concatWith(b) }
-                .map { DownloadableDataDto(it, ((alreadyFetched.toDouble() / largestUserCount) * 100).toInt()) }
+                .map { DownloadableDataDto(it, getPercent(fetchedAmount, largestUserCount)) }
     }
+
+    private fun getPercent(fetchedAmount: Int, largestUserCount: Int) =
+            ((fetchedAmount.toDouble() / largestUserCount) * 100).toInt()
 
     private fun toUserDtoIterable(objectNode: DownloadableDataDto<ObjectNode>): Iterable<DownloadableDataDto<User>> {
         return objectNode.data!!["response"]["items"]

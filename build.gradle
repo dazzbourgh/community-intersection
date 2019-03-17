@@ -37,4 +37,9 @@ jib {
         image = 'dazzbourgh/friend-finder'
         tags = ['latest']
     }
+    container {
+        jvmFlags = ['-XX:+UnlockExperimentalVMOptions',
+                    '-XX:+UseCGroupMemoryLimitForHeap',
+                    '-XX:MaxRAMFraction=1']
+    }
 }

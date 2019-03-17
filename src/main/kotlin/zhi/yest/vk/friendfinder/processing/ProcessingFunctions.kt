@@ -30,3 +30,7 @@ fun Flux<DownloadableDataDto<User>>.filterFaceless(): Flux<DownloadableDataDto<U
     return this
             .filter { it.data?.fields?.get("photo_200") != null && it.data.fields["photo_200"] != "" }
 }
+
+fun Flux<DownloadableDataDto<User>>.addFinisher(): Flux<DownloadableDataDto<User>> {
+    return this.concatWith { Flux.just(DownloadableDataDto(null, 100)) }
+}

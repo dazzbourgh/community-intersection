@@ -8,6 +8,7 @@ import reactor.core.publisher.Flux
 import zhi.yest.vk.friendfinder.domain.Request
 import zhi.yest.vk.friendfinder.domain.User
 import zhi.yest.vk.friendfinder.dto.DownloadableDataDto
+import zhi.yest.vk.friendfinder.processing.addFinisher
 import zhi.yest.vk.friendfinder.processing.filterByFields
 import zhi.yest.vk.friendfinder.processing.filterFaceless
 import zhi.yest.vk.friendfinder.processing.findInteresting
@@ -22,5 +23,6 @@ class PeopleController(private val groupService: GroupService) {
                 .findInteresting(request.communities.size)
                 .filterByFields { request.peopleFilters }
                 .filterFaceless()
+                .addFinisher()
     }
 }

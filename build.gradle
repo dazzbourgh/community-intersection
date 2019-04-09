@@ -5,6 +5,8 @@ plugins {
     id 'com.google.cloud.tools.jib' version '1.0.1'
 }
 
+project.ext.spek_version="2.0.0-rc.1"
+
 apply plugin: 'io.spring.dependency-management'
 
 group = 'zhi.yest.vk'
@@ -25,9 +27,26 @@ dependencies {
     implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-reactive', version: '1.1.1'
     implementation 'zhi.yest:vk-method-executor:1.0.2'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
+    testRuntimeOnly "org.spekframework.spek2:spek-runner-junit5:$spek_version"
+}
+
+// setup the test task
+test {
+    useJUnitPlatform {
+        includeEngines 'spek2'
+    }
 }
 
 compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '1.8'
+    }
+}
+
+compileTestKotlin {
     kotlinOptions {
         freeCompilerArgs = ['-Xjsr305=strict']
         jvmTarget = '1.8'

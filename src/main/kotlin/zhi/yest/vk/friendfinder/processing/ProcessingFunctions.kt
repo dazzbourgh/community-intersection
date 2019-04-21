@@ -29,7 +29,7 @@ fun ProducerScope<DownloadableDataDto<out User>>.filterInteresting(input: Receiv
 @ExperimentalCoroutinesApi
 fun ProducerScope<DownloadableDataDto<out User>>.filterByFields(input: ReceiveChannel<DownloadableDataDto<out User>>,
                                                                 filterMapSupplier: () -> Map<String, String>?) = createProducer(input) {
-    sendIfMatches(filterMapSupplier, it)
+    sendIfMatches(it, filterMapSupplier)
 }
 
 @ExperimentalCoroutinesApi
@@ -47,7 +47,7 @@ suspend fun ProducerScope<DownloadableDataDto<out User>>.sendIfInteresting(userD
 }
 
 @ExperimentalCoroutinesApi
-suspend fun ProducerScope<DownloadableDataDto<out User>>.sendIfMatches(filterMapSupplier: () -> Map<String, String>?, userDto: DownloadableDataDto<out User>) {
+suspend fun ProducerScope<DownloadableDataDto<out User>>.sendIfMatches(userDto: DownloadableDataDto<out User>, filterMapSupplier: () -> Map<String, String>?) {
     val filterMap = filterMapSupplier() ?: emptyMap()
     if (filterMap.isEmpty() || filterMap
                     .entries

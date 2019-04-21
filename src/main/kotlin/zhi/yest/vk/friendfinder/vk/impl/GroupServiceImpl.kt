@@ -60,14 +60,15 @@ private fun ObjectNode.toUserList(): List<User> {
             .toList()
             .flatten()
             .map { value ->
-                val user = User(value["id"].asInt())
-                FIELDS.forEach { field ->
-                    value[field]
-                            // a trick for 'city' field, which is an object instead of a string
-                            ?.let { it["title"] ?: it }
-                            ?.toString()
-                            ?.also { user.fields[field] = it.trimQuotes() }
-                }
-                user
+                FIELDS
+                        .map { field ->
+                            field to value[field]
+                                    // a trick for 'city' field, which is an object instead of a string
+                                    ?.let { it["title"] ?: it }
+                                    ?.toString()
+                                    ?.let { it.trimQuotes() }!!
+                        }
+                        .toMap()
+                        .let { User(value["id"].asInt(), it) }
             }
 }

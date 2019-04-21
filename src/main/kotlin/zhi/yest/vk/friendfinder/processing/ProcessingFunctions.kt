@@ -60,6 +60,9 @@ fun ProducerScope<DownloadableDataDto<out User>>.createProducer(input: ReceiveCh
                                                                 action: suspend (DownloadableDataDto<out User>) -> Unit) = produce {
     for (userDto in input) {
         val user = userDto.data
+        // null user means this is a percentage only DTO, no processing
+        // is required for such objects and we just push it further
+        // down the pipeline
         if (user == null) send(userDto)
         action(userDto)
     }

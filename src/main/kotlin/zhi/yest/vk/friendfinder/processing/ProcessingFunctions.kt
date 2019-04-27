@@ -1,7 +1,6 @@
 package zhi.yest.vk.friendfinder.processing
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
@@ -12,7 +11,7 @@ import zhi.yest.vk.friendfinder.util.trimQuotes
 import java.util.concurrent.ConcurrentHashMap
 
 @ExperimentalCoroutinesApi
-suspend fun ProducerScope<DownloadableDataDto<out User>>.processUsers(userChannel: Channel<DownloadableDataDto<out User>>, request: Request) {
+fun ProducerScope<DownloadableDataDto<out User>>.processUserDtos(userChannel: ReceiveChannel<DownloadableDataDto<out User>>, request: Request) = produce<DownloadableDataDto<out User>> {
     val interestingUsers = filterInteresting(userChannel, request.communities.size)
     val matchingUsers = filterByFields(interestingUsers) { request.peopleFilters }
     val usersWithPhoto = filterPhotos(matchingUsers)

@@ -2,7 +2,9 @@ package zhi.yest.vk.friendfinder.processing
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.spekframework.spek2.Spek
@@ -58,13 +60,32 @@ object ProcessingFunctionsSpec : Spek({
                             totalUsersSent++
                             assertEquals(user, boringUser)
                         }
+                        assertEquals(totalUsersSent, 1)
                     }
                 }
             }
         }
 
         describe("a function that filters users with photos") {
-
+            it("sends only users with photos") {
+                runBlocking {
+                    val channel = Channel<DownloadableDataDto<out User>>()
+                    launch {
+                        channel.send(interestingUser)
+                        channel.send(boringUser)
+                        channel.close()
+                    }
+                    GlobalScope.produce<DownloadableDataDto<out User>> {
+                        filterPhotos(channel)
+                    }.also {
+                        for (user in it) {
+                            totalUsersSent++
+                            assertEquals(user, interestingUser)
+                        }
+                        assertEquals(totalUsersSent, 1)
+                    }
+                }
+            }
         }
     }
 })

@@ -34,7 +34,7 @@ dependencies {
     implementation 'zhi.yest:vk-method-executor:1.0.2'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 
-
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.+"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"

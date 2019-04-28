@@ -20,45 +20,50 @@ import zhi.yest.vk.friendfinder.vk.GroupService
 import java.util.concurrent.ConcurrentHashMap
 
 @Configuration
-class FilteringFunctionsConfiguration {
+class PeopleFunctionsConfiguration {
     @Bean
     @Scope("prototype")
-    fun processingFunctions(): List<(User) -> (Request) -> Boolean> {
+    fun filteringFunctions(): List<(User) -> (Request) -> Boolean> {
         return listOf(filterInteresting(ConcurrentHashMap()),
                 ::filterByFields,
                 ::filterPhotos)
     }
 
     @Bean
-    fun processingFunctionsSupplier(applicationContext: ApplicationContext): () -> List<(User) -> (Request) -> Boolean> = {
-        applicationContext.getBean("processingFunctions") as List<(User) -> (Request) -> Boolean>
+    fun filteringFunctionsSupplier(applicationContext: ApplicationContext): () -> List<(User) -> (Request) -> Boolean> = {
+        applicationContext.getBean("filteringFunctions") as List<(User) -> (Request) -> Boolean>
     }
 
     @ExperimentalCoroutinesApi
     @Bean
-    fun fetchUsers(groupService: GroupService): suspend ProducerScope<DownloadableDataDto<out User>>.(Request) -> ReceiveChannel<DownloadableDataDto<out User>> = { request ->
-        val membersCountList = request.communities.map { groupService.getMembersCount(it) }
-        val totalMembersCount = membersCountList.sum()
-        val communitiesCountPairs = request.communities.zip(membersCountList)
-        produce {
-            communitiesCountPairs.map { groupService.getMembers(it.first, it.second) }
-                    .reduce { acc, flux -> acc.concatWith(flux) }
-                    .index()
-                    .consumeEach { insertPercentageDtos(totalMembersCount, it) }
-                    .also {
-                        send(DownloadableDataDto(null, 100))
-                        close()
-                    }
-        }
-    }
+    fun fetchUsersBean(groupService: GroupService) = fetchUsers(groupService)
 
-    @ExperimentalCoroutinesApi
-    private suspend fun ProducerScope<DownloadableDataDto<out User>>.insertPercentageDtos(totalMembersCount: Int, indexUserPair: Tuple2<Long, User>) {
-        val fivePercentStep = totalMembersCount / 20
-        val percentage = (indexUserPair.t1 / totalMembersCount.toFloat()) * 100
-        val intPercentage = percentage.toInt()
-        val userDto = DownloadableDataDto(indexUserPair.t2, intPercentage)
-        if (indexUserPair.t1 % fivePercentStep == 0L) send(DownloadableDataDto(null, intPercentage))
-        send(userDto)
+}
+
+@ExperimentalCoroutinesApi
+fun fetchUsers(groupService: GroupService): suspend ProducerScope<DownloadableDataDto<out User>>.(request: Request) -> ReceiveChannel<DownloadableDataDto<out User>> = { request ->
+    val membersCountList = request.communities.map { groupService.getMembersCount(it) }
+    val totalMembersCount = membersCountList.sum()
+    val communitiesCountPairs = request.communities.zip(membersCountList)
+    produce {
+        send(DownloadableDataDto(null, 1))
+        communitiesCountPairs.map { groupService.getMembers(it.first, it.second) }
+                .reduce { acc, flux -> acc.concatWith(flux) }
+                .index()
+                .consumeEach { insertPercentageDtos(totalMembersCount, it) }
+                .also {
+                    send(DownloadableDataDto(null, 100))
+                    close()
+                }
     }
+}
+
+@ExperimentalCoroutinesApi
+private suspend fun ProducerScope<DownloadableDataDto<out User>>.insertPercentageDtos(totalMembersCount: Int, indexUserPair: Tuple2<Long, User>) {
+    val fivePercentStep = totalMembersCount / 20
+    val percentage = (indexUserPair.t1 / totalMembersCount.toFloat()) * 100
+    val intPercentage = percentage.toInt()
+    val userDto = DownloadableDataDto(indexUserPair.t2, intPercentage)
+    if (indexUserPair.t1 % fivePercentStep == 0L) send(DownloadableDataDto(null, intPercentage))
+    send(userDto)
 }

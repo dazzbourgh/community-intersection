@@ -1,29 +1,8 @@
 package zhi.yest.vk.friendfinder.filtering
 
-import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Scope
 import zhi.yest.vk.friendfinder.domain.Request
 import zhi.yest.vk.friendfinder.domain.User
 import zhi.yest.vk.friendfinder.util.trimQuotes
-import java.util.concurrent.ConcurrentHashMap
-
-@Configuration
-class FilteringFunctionsConfiguration {
-    @Bean
-    @Scope("prototype")
-    fun processingFunctions(): List<(User) -> (Request) -> Boolean> {
-        return listOf(filterInteresting(ConcurrentHashMap()),
-                ::filterByFields,
-                ::filterPhotos)
-    }
-
-    @Bean
-    fun processingFunctionsSupplier(applicationContext: ApplicationContext): () -> List<(User) -> (Request) -> Boolean> = {
-        applicationContext.getBean("processingFunctions") as List<(User) -> (Request) -> Boolean>
-    }
-}
 
 fun filterInteresting(userCountMap: MutableMap<User, Int>): (User) -> (Request) -> Boolean = { user ->
     { request ->

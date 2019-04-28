@@ -54,7 +54,6 @@ class GroupServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : GroupSe
     }
 }
 
-
 private fun ObjectNode.toUserList(): List<User> {
     return this["response"]
             .toList()
@@ -62,11 +61,11 @@ private fun ObjectNode.toUserList(): List<User> {
             .map { value ->
                 FIELDS
                         .map { field ->
-                            field to value[field]
+                            field to (value[field]
                                     // a trick for 'city' field, which is an object instead of a string
                                     ?.let { it["title"] ?: it }
                                     ?.toString()
-                                    ?.let { it.trimQuotes() }!!
+                                    ?.let { it.trimQuotes() } ?: "")
                         }
                         .toMap()
                         .let { User(value["id"].asInt(), it) }

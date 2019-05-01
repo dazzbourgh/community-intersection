@@ -1,7 +1,7 @@
 package zhi.yest.vk.friendfinder.controller.people
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
@@ -14,15 +14,18 @@ import org.springframework.web.bind.annotation.RestController
 import zhi.yest.vk.friendfinder.domain.Request
 import zhi.yest.vk.friendfinder.domain.User
 import zhi.yest.vk.friendfinder.dto.DownloadableDataDto
+import kotlin.coroutines.EmptyCoroutineContext
 
 @ExperimentalCoroutinesApi
 @RestController
 @RequestMapping("people")
 class PeopleController(private val fetchUsers: suspend ProducerScope<DownloadableDataDto<out User>>.(Request) -> ReceiveChannel<DownloadableDataDto<out User>>,
                        private val processingFunctionsSupplier: () -> List<(User) -> (Request) -> Boolean>) {
+    private val scope = CoroutineScope(EmptyCoroutineContext)
+
     @ExperimentalCoroutinesApi
     @PostMapping(produces = ["application/stream+json"])
-    fun findInteresting(@RequestBody request: Request): Publisher<DownloadableDataDto<out User>> = GlobalScope.publish {
+    fun findInteresting(@RequestBody request: Request): Publisher<DownloadableDataDto<out User>> = scope.publish {
         val userChannel = fetchUsers(request)
         val processedUsers = processUserDtos(userChannel,
                 request,

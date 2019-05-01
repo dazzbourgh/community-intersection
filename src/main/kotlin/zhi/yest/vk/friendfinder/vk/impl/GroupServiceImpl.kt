@@ -2,8 +2,9 @@ package zhi.yest.vk.friendfinder.vk.impl
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import kotlinx.coroutines.reactive.awaitSingle
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.toFlux
@@ -16,16 +17,17 @@ import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
 
 @Service
-@ConfigurationProperties(prefix = "vk.group")
 class GroupServiceImpl(private val delayingSupplier: DelayingSupplier,
-                       private val vkMethodExecutor: VkMethodExecutor) : GroupService {
+                       private val vkMethodExecutor: VkMethodExecutor,
+                       config: GroupServiceConfig) : GroupService {
+    private val safeLoopsNumber: Int = config.props["loops"]
+            ?: error("Safe loops number was not provided in properties.")
+    private val threshold: Int = config.props["threshold"] ?: error("Threshold was not provided in properties.")
+    private val maxUsersPerIteration: Int
 
-    @Value("\${loops}")
-    private var safeLoopsNumber = 0
-    @Value("\${threshold}")
-    private var threshold = 0
-    @Value("\${maxUsers}")
-    private var maxUsersPerIteration = 0
+    init {
+        maxUsersPerIteration = safeLoopsNumber * threshold
+    }
 
     override suspend fun getMembersCount(groupId: Int): Int =
             delayingSupplier.supply {
@@ -76,4 +78,11 @@ private fun ObjectNode.toUserList(): List<User> {
                         .toMap()
                         .let { User(value["id"].asInt(), it) }
             }
+}
+
+@Configuration("groupServiceConfig")
+@ConfigurationProperties(prefix = "vk.group")
+@EnableConfigurationProperties
+class GroupServiceConfig {
+    lateinit var props: Map<String, Int>
 }

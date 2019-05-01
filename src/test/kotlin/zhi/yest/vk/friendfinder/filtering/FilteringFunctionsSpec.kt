@@ -28,7 +28,7 @@ object FilteringFunctionsSpec : Spek({
                 assertTrue(filterByFields(interestingUser)(requestWithoutFilters))
                 assertTrue(filterByFields(boringUser)(requestWithoutFilters))
             }
-            it("sends only users that match filter map") {
+            it("sends only users that match filter props") {
                 assertTrue(filterByFields(boringUser)(request))
                 assertFalse(filterByFields(interestingUser)(request))
             }

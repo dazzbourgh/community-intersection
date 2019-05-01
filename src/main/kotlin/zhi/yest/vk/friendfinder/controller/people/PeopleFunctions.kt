@@ -31,13 +31,13 @@ class PeopleFunctionsConfiguration {
 
     @Bean
     fun filteringFunctionsSupplier(applicationContext: ApplicationContext): () -> List<(User) -> (Request) -> Boolean> = {
+        @Suppress("UNCHECKED_CAST")
         applicationContext.getBean("filteringFunctions") as List<(User) -> (Request) -> Boolean>
     }
 
     @ExperimentalCoroutinesApi
     @Bean
     fun fetchUsersBean(groupService: GroupService) = fetchUsers(groupService)
-
 }
 
 @ExperimentalCoroutinesApi

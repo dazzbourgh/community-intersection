@@ -1,2 +1,9 @@
 server:
   port: ${PORT:8080}
+vk:
+  request:
+    interval: 500
+  group:
+    loops: 25
+    threshold: 1000
+    maxUsers: ${vk.loops * vk.threshold}

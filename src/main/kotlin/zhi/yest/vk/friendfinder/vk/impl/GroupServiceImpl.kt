@@ -11,13 +11,13 @@ import reactor.core.publisher.toFlux
 import zhi.yest.vk.friendfinder.domain.FIELDS
 import zhi.yest.vk.friendfinder.domain.User
 import zhi.yest.vk.friendfinder.util.trimQuotes
-import zhi.yest.vk.friendfinder.vk.DelayingSupplier
+import zhi.yest.vk.friendfinder.vk.DelayingRequestSender
 import zhi.yest.vk.friendfinder.vk.GroupService
 import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
 
 @Service
-class GroupServiceImpl(private val delayingSupplier: DelayingSupplier,
+class GroupServiceImpl(private val delayingRequestSender: DelayingRequestSender,
                        private val vkMethodExecutor: VkMethodExecutor,
                        config: GroupServiceConfig) : GroupService {
     private val safeLoopsNumber: Int = config.props["loops"]
@@ -30,12 +30,12 @@ class GroupServiceImpl(private val delayingSupplier: DelayingSupplier,
     }
 
     override suspend fun getMembersCount(groupId: Int): Int =
-            delayingSupplier.supply {
+            delayingRequestSender.request {
                 vkMethodExecutor.execute(Methods.Groups.GET_BY_ID.toString(),
                         mapOf("group_ids" to groupId.toString(),
                                 "fields" to "members_count"))
             }
-                    .map { it["response"][0]["members_count"].asInt() }
+                    .map { it.toMembersCount() }
                     .awaitSingle()
 
 
@@ -47,7 +47,7 @@ class GroupServiceImpl(private val delayingSupplier: DelayingSupplier,
                 .map { i ->
                     val remainder = membersCount - maxUsersPerIteration * i
                     val loops = if (remainder > safeLoopsNumber) safeLoopsNumber else remainder / threshold + 1
-                    delayingSupplier.supply {
+                    delayingRequestSender.request {
                         vkMethodExecutor.execute(Methods.Execute.EXECUTE.code("getUsers"),
                                 mapOf("start" to "${i * safeLoopsNumber}",
                                         "loops" to "$loops",
@@ -60,6 +60,10 @@ class GroupServiceImpl(private val delayingSupplier: DelayingSupplier,
                 .map { it.toUserList() }
                 .flatMapIterable { it }
     }
+}
+
+private fun ObjectNode.toMembersCount(): Int {
+    return this["response"][0]["members_count"].asInt()
 }
 
 private fun ObjectNode.toUserList(): List<User> {

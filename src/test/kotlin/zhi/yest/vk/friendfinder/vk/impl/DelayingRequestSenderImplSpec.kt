@@ -1,30 +1,34 @@
 package zhi.yest.vk.friendfinder.vk.impl
 
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import zhi.yest.vk.friendfinder.vk.DelayingSupplier
+import zhi.yest.vk.friendfinder.vk.DelayingRequestSender
 import kotlin.system.measureTimeMillis
 
-object DelayingSupplierImplSpec : Spek({
+@ObsoleteCoroutinesApi
+object DelayingRequestSenderImplSpec : Spek({
     val interval = 50
     val items = 20
-    val delayingSupplier: DelayingSupplier = DelayingSupplierImpl(interval)
+    val delayingRequestSender: DelayingRequestSender = DelayingRequestSenderImpl(interval)
     describe("delaying supplier") {
-        it("should supply with interval") {
+        it("should request with interval") {
             var time = 0L
             var result: List<Int>? = null
             runBlocking {
-                (delayingSupplier as DelayingSupplierImpl).startProcessing()
                 time = measureTimeMillis {
                     val deferreds = mutableListOf<Deferred<Int>>()
                     repeat(items) {
                         async {
-                            delayingSupplier.supply { it }
+                            delayingRequestSender.request { it }
                         }
                                 .also { deferreds.add(it) }
                                 .also { result = deferreds.map { it.await() } }
@@ -33,6 +37,19 @@ object DelayingSupplierImplSpec : Spek({
             }
             assertTrue(time > interval * items - 2 * interval)
             assertIterableEquals((0 until items), result)
+        }
+        it("should continue working if request fails") {
+            var t = 0
+            runBlocking {
+                withContext(Dispatchers.Default) {
+                    try {
+                        delayingRequestSender.request { throw RuntimeException() }
+                    } catch (e: Exception) {
+                    }
+                    t = delayingRequestSender.request { 1 }
+                }
+            }
+            assertEquals(1, t)
         }
     }
 })

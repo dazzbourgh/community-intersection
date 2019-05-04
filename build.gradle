@@ -43,7 +43,6 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }
 
-// setup the test task
 test {
     useJUnitPlatform {
         includeEngines 'spek2'

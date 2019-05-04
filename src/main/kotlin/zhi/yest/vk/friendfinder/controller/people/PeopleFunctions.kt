@@ -64,6 +64,6 @@ private suspend fun ProducerScope<DownloadableDataDto<out User>>.insertPercentag
     val percentage = (indexUserPair.t1 / totalMembersCount.toFloat()) * 100
     val intPercentage = percentage.toInt()
     val userDto = DownloadableDataDto(indexUserPair.t2, intPercentage)
-    if (indexUserPair.t1 % fivePercentStep == 0L) send(DownloadableDataDto(null, intPercentage))
+    if (fivePercentStep > 0 && indexUserPair.t1 % fivePercentStep == 0L) send(DownloadableDataDto(null, intPercentage))
     send(userDto)
 }

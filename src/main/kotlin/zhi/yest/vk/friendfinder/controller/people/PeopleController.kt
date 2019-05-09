@@ -20,7 +20,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 @RestController
 @RequestMapping("people")
 class PeopleController(private val fetchUsers: suspend ProducerScope<DownloadableDataDto<out User>>.(Request) -> ReceiveChannel<DownloadableDataDto<out User>>,
-                       private val processingFunctionsSupplier: () -> List<(User) -> (Request) -> Boolean>) {
+                       private val filteringFunctionsSupplier: () -> List<(User) -> (Request) -> Boolean>) {
     private val scope = CoroutineScope(EmptyCoroutineContext)
 
     @ExperimentalCoroutinesApi
@@ -29,7 +29,7 @@ class PeopleController(private val fetchUsers: suspend ProducerScope<Downloadabl
         val userChannel = fetchUsers(request)
         val processedUsers = processUserDtos(userChannel,
                 request,
-                processingFunctionsSupplier())
+                filteringFunctionsSupplier())
         for (processedUser in processedUsers) send(processedUser)
     }
 }

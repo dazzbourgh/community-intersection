@@ -33,7 +33,7 @@ class DelayingRequestSenderImpl(@Value("\${vk.request.interval}") private val in
         }
     }
 
-    override suspend fun <T> request(block: () -> T): T {
+    override suspend fun <T> request(block: suspend () -> T): T {
         val deferred = coroutineScope.async(start = CoroutineStart.LAZY) { block() }
         actor.send(deferred)
         return deferred.await()

@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import zhi.yest.vk.friendfinder.domain.FIELDS
 import zhi.yest.vk.friendfinder.domain.User
@@ -15,6 +16,10 @@ import zhi.yest.vk.friendfinder.vk.DelayingRequestSender
 import zhi.yest.vk.friendfinder.vk.GroupService
 import zhi.yest.vkmethodexecutor.Methods
 import zhi.yest.vkmethodexecutor.VkMethodExecutor
+import java.util.logging.Level
+import java.util.logging.Logger
+
+val LOGGER = Logger.getLogger(GroupServiceImpl::class.java.simpleName)
 
 @Service
 class GroupServiceImpl(private val delayingRequestSender: DelayingRequestSender,
@@ -56,7 +61,13 @@ class GroupServiceImpl(private val delayingRequestSender: DelayingRequestSender,
                     }
                 }
                 .map { it.toFlux() }
-                .reduce { acc, mono -> acc.concatWith(mono) }
+                .reduce { acc, mono ->
+                    acc.concatWith(mono
+                            .onErrorResume { err ->
+                                LOGGER.log(Level.SEVERE, err) { "Error during request to VK" }
+                                Mono.empty()
+                            })
+                }
                 .map { it.toUserList() }
                 .flatMapIterable { it }
     }

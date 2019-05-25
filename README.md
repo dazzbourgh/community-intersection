@@ -5,4 +5,4 @@ A back end application that allows you to find users that are members of multipl
 Kotlin based, Spring WebFlux + Coroutines. VK API is used alongside stored procedures that are called from this app.
 
 ## UI
-For UI and an example please refer to [UI project page](https://github.com/dazzbourgh/community-intersection-ui)
+For UI and an example please refer to [UI project page](https://github.com/dazzbourgh/community-intersection-ui).

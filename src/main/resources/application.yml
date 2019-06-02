@@ -3,7 +3,22 @@ server:
 vk:
   request:
     interval: 500
-  group:
-    props:
-      loops: 25
-      threshold: 1000
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          vk:
+            client-id: ${client_id}
+            client-secret: ${client_secret}
+            authorization-grant-type: authorization_code
+            #            clientAuthenticationMethod: form
+            #            provider: vk
+            scopes: read
+            redirect-uri-template: ${base-url}/login/oauth2/code/vk
+        #            redirect-uri-template: ${base-url}/test
+        provider:
+          vk:
+            authorization-uri: https://oauth.vk.com/authorize
+            token-uri: https://oauth.vk.com/access_token
+            user-info-uri: https://api.vk.com/method/users.get

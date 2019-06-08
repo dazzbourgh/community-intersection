@@ -15,7 +15,7 @@ spring:
             #            clientAuthenticationMethod: form
             #            provider: vk
             scopes: read
-            redirect-uri-template: ${base-url}/login/oauth2/code/vk
+            redirect-uri: ${base-url}/login/oauth2/code/vk
         #            redirect-uri-template: ${base-url}/test
         provider:
           vk:

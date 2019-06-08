@@ -32,7 +32,8 @@ class VkAuthorizationRequestResolver(
     private fun Mono<OAuth2AuthorizationRequest>.addParameters() =
             this.map { request ->
                 val additionalParameters = mapOf("v" to "5.95",
-                        "scope" to "wall,offline")
+                        "scope" to "wall,offline",
+                        "registration_id" to "vk")
                 OAuth2AuthorizationRequest.from(request)
                         .additionalParameters(additionalParameters)
                         .build()

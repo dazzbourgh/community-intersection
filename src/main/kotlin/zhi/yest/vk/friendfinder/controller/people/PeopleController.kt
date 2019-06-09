@@ -3,6 +3,7 @@ package zhi.yest.vk.friendfinder.controller.people
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.reactive.publish
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,11 +21,11 @@ class PeopleController(private val userService: UserService,
     private val scope = CoroutineScope(EmptyCoroutineContext)
 
     @PostMapping(produces = ["application/stream+json"])
-    fun findInteresting(@RequestBody request: Request) = scope.publish {
+    fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) = scope.publish {
         request.groupIds
                 .flatMap {
                     delayingRequestSender.request {
-                        userService.search(it, request.fields)
+                        userService.search(it, request.fields, authentication.principal)
                     }
                 }
                 .groupingBy { it }

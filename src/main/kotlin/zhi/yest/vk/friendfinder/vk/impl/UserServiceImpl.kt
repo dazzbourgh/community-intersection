@@ -1,42 +1,38 @@
 package zhi.yest.vk.friendfinder.vk.impl
 
-import com.fasterxml.jackson.databind.node.ObjectNode
 import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
-import zhi.yest.vk.friendfinder.domain.FIELDS
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
+import zhi.yest.vk.friendfinder.config.security.authenticated
+import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
 import zhi.yest.vk.friendfinder.domain.User
-import zhi.yest.vk.friendfinder.util.trimQuotes
 import zhi.yest.vk.friendfinder.vk.UserService
-import zhi.yest.vkmethodexecutor.Methods
-import zhi.yest.vkmethodexecutor.VkMethodExecutor
 
 @Service
-class UserServiceImpl(private val vkMethodExecutor: VkMethodExecutor) : UserService {
-    override suspend fun search(groupId: String, fields: Map<String, String>): List<User> {
-        return vkMethodExecutor.execute(Methods.Execute.EXECUTE.code("searchUsers"),
-                mapOf("groupId" to groupId,
-                        "sex" to fields["sex"]!!,
-                        "city" to fields["city"]!!,
-                        "ageFrom" to fields["ageFrom"]!!,
-                        "ageTo" to fields["ageTo"]!!))
-                .map { it.toUserList() }
-                .awaitSingle()
-    }
-}
+class UserServiceImpl : UserService {
+    override suspend fun search(groupId: String,
+                                fields: Map<String, String>,
+                                oAuth2User: OAuth2User): List<User> =
+            WebClient.builder()
+                    .filter(authenticated(oAuth2User))
+                    .build()
+                    .get()
+                    .uri { builder ->
+                        builder.scheme("https")
+                                .host("api.vk.com")
+                                .path("method/execute.searchUsers")
+                                .queryParam("groupId", groupId)
+                                .queryParam("sex", fields["sex"])
+                                .queryParam("city", fields["city"])
+                                .queryParam("ageFrom", fields["ageFrom"])
+                                .queryParam("ageTo", fields["ageTo"])
+                                .build()
+                    }
+                    .exchange()
+                    .flatMap { it.bodyToMono<VkResponse<User>>() }
+                    .map { it.response }
+                    .awaitSingle()
 
-private fun ObjectNode.toUserList(): List<User> {
-    return this["response"]
-            .toList()
-            .map { value ->
-                FIELDS
-                        .map { field ->
-                            field to (value[field]
-                                    // a trick for 'city' field, which is an object instead of a string
-                                    ?.let { it["title"] ?: it }
-                                    ?.toString()
-                                    ?.let { it.trimQuotes() } ?: "")
-                        }
-                        .toMap()
-                        .let { User(value["id"].asInt(), it) }
-            }
 }

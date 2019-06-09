@@ -11,6 +11,6 @@ data class VkUser(val id: Long,
 
 class VkOAuth2AccessTokenResponse(
         @JsonAlias("access_token")
-        val accessToken: String?,
+        val accessToken: String,
         @JsonAlias("expires_in")
-        val expiresIn: String?)
+        val expiresIn: String)

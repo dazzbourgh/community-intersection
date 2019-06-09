@@ -7,12 +7,9 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginReactiveAuthenticationManager
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.security.oauth2.client.web.server.OAuth2AuthorizationRequestRedirectWebFilter
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver
-import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -39,25 +36,15 @@ class SecurityConfig {
     }
 
     @Bean
-    fun webClient(reactiveClientRegistrationRepository: ReactiveClientRegistrationRepository,
-                  serverOAuth2AuthorizedClientRepository: ServerOAuth2AuthorizedClientRepository,
-                  vkCodeTokenResponseClient: VkCodeTokenResponseClient): WebClient {
-        val filter = ServerOAuth2AuthorizedClientExchangeFilterFunction(
-                reactiveClientRegistrationRepository,
-                serverOAuth2AuthorizedClientRepository)
-        return WebClient.builder().filter(filter).build()
-    }
-
-    @Bean
     fun authManager(vkCodeTokenResponseClient: VkCodeTokenResponseClient,
-                    webClient: WebClient,
                     clientProperties: OAuth2ClientProperties): ReactiveAuthenticationManager {
         return OAuth2LoginReactiveAuthenticationManager(vkCodeTokenResponseClient, ReactiveOAuth2UserService { oAuth2UserRequest ->
-            webClient.get()
+            WebClient.create().get()
                     .uri(clientProperties.provider["vk"]
                             ?.userInfoUri!!
                             //TODO: externalize hardcoded version
-                            + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=5.95")
+                            + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=5.95"
+                    )
                     .exchange()
                     .flatMap { it.bodyToFlux<VkResponse<VkUser>>().toMono() }
                     .map { it.response[0] }
@@ -67,7 +54,8 @@ class SecurityConfig {
                                 mutableMapOf("id" to it.id,
                                         "firstName" to it.firstName,
                                         "lastName" to it.lastName,
-                                        "fullName" to "${it.firstName} ${it.lastName}"),
+                                        "fullName" to "${it.firstName} ${it.lastName}",
+                                        "token" to oAuth2UserRequest.accessToken.tokenValue),
                                 "fullName")
                     }
         })

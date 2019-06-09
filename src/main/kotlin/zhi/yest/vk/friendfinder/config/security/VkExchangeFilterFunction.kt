@@ -1,0 +1,30 @@
+/*
+ * Copyright 2002-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package zhi.yest.vk.friendfinder.config.security
+
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.web.reactive.function.client.ClientRequest
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
+import reactor.core.publisher.Mono
+import java.net.URI
+
+fun authenticated(authentication: OAuth2AuthenticationToken) =
+        ExchangeFilterFunction.ofRequestProcessor {
+            Mono.just(ClientRequest.from(it)
+                    //TODO: externalize hardcoded version
+                    .url(URI("${it.url()}?access_token=${authentication.principal.attributes["token"]}&v=5.95"))
+                    .build())
+        }

@@ -17,8 +17,6 @@ class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registr
                                 private val clientId: String,
                                 @Value("\${spring.security.oauth2.client.registration.vk.client-secret}")
                                 private val clientSecret: String) : ReactiveOAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
-    private val webClient = WebClient.create()
-
     override fun getTokenResponse(authorizationGrantRequest: OAuth2AuthorizationCodeGrantRequest): Mono<OAuth2AccessTokenResponse> {
         return Mono.defer {
             val clientRegistration = authorizationGrantRequest.clientRegistration
@@ -34,15 +32,14 @@ class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registr
                             .map { "${it.key}=${it.value}" }
                             .joinToString(separator = "&", prefix = "?")
 
-            this.webClient.get()
+            WebClient.create().get()
                     .uri(tokenUri)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .flatMap { response -> response.body(BodyExtractors.toMono(VkOAuth2AccessTokenResponse::class.java)) }
                     .map { vkOAuth2AccessTokenResponse ->
-                        // TODO: deal with TEST
-                        OAuth2AccessTokenResponse.withToken(vkOAuth2AccessTokenResponse.accessToken ?: "TEST")
-                                .expiresIn(vkOAuth2AccessTokenResponse.expiresIn?.toLong() ?: 0)
+                        OAuth2AccessTokenResponse.withToken(vkOAuth2AccessTokenResponse.accessToken)
+                                .expiresIn(vkOAuth2AccessTokenResponse.expiresIn.toLong())
                                 .tokenType(OAuth2AccessToken.TokenType.BEARER)
                                 .scopes(setOf("wall", "offline"))
                                 .build()

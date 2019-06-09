@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import zhi.yest.vk.friendfinder.config.security.dto.VkOAuth2AccessTokenResponse
 
 @Component
 class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registration.vk.client-id}")
                                 private val clientId: String,
                                 @Value("\${spring.security.oauth2.client.registration.vk.client-secret}")
                                 private val clientSecret: String) : ReactiveOAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
-    private val webClient = WebClient.builder()
-            .build()
+    private val webClient = WebClient.create()
 
     override fun getTokenResponse(authorizationGrantRequest: OAuth2AuthorizationCodeGrantRequest): Mono<OAuth2AccessTokenResponse> {
         return Mono.defer {
@@ -41,8 +41,8 @@ class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registr
                     .flatMap { response -> response.body(BodyExtractors.toMono(VkOAuth2AccessTokenResponse::class.java)) }
                     .map { vkOAuth2AccessTokenResponse ->
                         // TODO: deal with TEST
-                        OAuth2AccessTokenResponse.withToken(vkOAuth2AccessTokenResponse.access_token ?: "TEST")
-                                .expiresIn(vkOAuth2AccessTokenResponse.expires_in?.toLong() ?: 0)
+                        OAuth2AccessTokenResponse.withToken(vkOAuth2AccessTokenResponse.accessToken ?: "TEST")
+                                .expiresIn(vkOAuth2AccessTokenResponse.expiresIn?.toLong() ?: 0)
                                 .tokenType(OAuth2AccessToken.TokenType.BEARER)
                                 .scopes(setOf("wall", "offline"))
                                 .build()

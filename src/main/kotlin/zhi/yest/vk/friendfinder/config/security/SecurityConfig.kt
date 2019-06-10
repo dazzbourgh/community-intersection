@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
 import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
-import zhi.yest.vk.friendfinder.config.security.dto.VkUser
+import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
 
 
 @Configuration
@@ -48,7 +48,7 @@ class SecurityConfig {
                             + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=5.95"
                     )
                     .exchange()
-                    .flatMap { it.bodyToFlux<VkResponse<VkUser>>().toMono() }
+                    .flatMap { it.bodyToFlux<VkResponse<VkUserInfo>>().toMono() }
                     .map { it.response[0] }
                     .map {
                         DefaultOAuth2User(

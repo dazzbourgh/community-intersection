@@ -29,6 +29,8 @@ class VkAuthorizationRequestResolver(
                 .addParameters()
     }
 
+    // This is required to pass mandatory parameters of "v" and "scope"
+    // during authorization in VK.
     private fun Mono<OAuth2AuthorizationRequest>.addParameters() =
             this.map { request ->
                 val additionalParameters = mapOf("v" to "5.95",

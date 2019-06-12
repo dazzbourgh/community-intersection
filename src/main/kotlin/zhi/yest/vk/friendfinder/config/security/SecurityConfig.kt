@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.ReactiveAuthenticationManager
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginReactiveAuthenticationManager
@@ -13,6 +14,9 @@ import org.springframework.security.oauth2.client.web.server.ServerOAuth2Authori
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.web.reactive.config.CorsRegistry
+import org.springframework.web.reactive.config.WebFluxConfigurer
+import org.springframework.web.reactive.config.WebFluxConfigurerComposite
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
@@ -21,6 +25,7 @@ import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
 
 
 @Configuration
+@EnableWebFluxSecurity
 class SecurityConfig {
     @Bean
     fun configure(http: ServerHttpSecurity,
@@ -61,5 +66,16 @@ class SecurityConfig {
                                 "fullName")
                     }
         })
+    }
+
+    // Turn off CORS
+    @Bean
+    fun corsConfigurer(): WebFluxConfigurer {
+        return object : WebFluxConfigurerComposite() {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
+            }
+        }
     }
 }

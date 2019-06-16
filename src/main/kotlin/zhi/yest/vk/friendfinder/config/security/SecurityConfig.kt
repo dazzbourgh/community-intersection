@@ -1,5 +1,6 @@
 package zhi.yest.vk.friendfinder.config.security
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -46,13 +47,14 @@ class SecurityConfig {
 
     @Bean
     fun authManager(vkCodeTokenResponseClient: VkCodeTokenResponseClient,
-                    clientProperties: OAuth2ClientProperties): ReactiveAuthenticationManager {
+                    clientProperties: OAuth2ClientProperties,
+                    @Value("\${vk.api.version}")
+                    vkApiVersion: String): ReactiveAuthenticationManager {
         return OAuth2LoginReactiveAuthenticationManager(vkCodeTokenResponseClient, ReactiveOAuth2UserService { oAuth2UserRequest ->
             WebClient.create().get()
                     .uri(clientProperties.provider["vk"]
                             ?.userInfoUri!!
-                            //TODO: externalize hardcoded version
-                            + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=5.95"
+                            + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=$vkApiVersion"
                     )
                     .exchange()
                     .flatMap { it.bodyToFlux<VkResponse<VkUserInfo>>().toMono() }

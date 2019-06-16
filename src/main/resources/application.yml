@@ -3,6 +3,8 @@ server:
 vk:
   request:
     interval: 500
+  api:
+    version: 5.95
 spring:
   security:
     oauth2:

@@ -34,5 +34,4 @@ class UserServiceImpl : UserService {
                     .flatMap { it.bodyToMono<VkResponse<User>>() }
                     .map { it.response }
                     .awaitSingle()
-
 }

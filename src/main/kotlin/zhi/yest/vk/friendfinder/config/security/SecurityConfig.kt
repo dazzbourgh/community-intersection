@@ -14,15 +14,15 @@ import org.springframework.security.oauth2.client.web.server.ServerOAuth2Authori
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.web.reactive.config.CorsRegistry
-import org.springframework.web.reactive.config.WebFluxConfigurer
-import org.springframework.web.reactive.config.WebFluxConfigurerComposite
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.reactive.CorsWebFilter
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
 import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
 import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
-
+import java.util.Arrays
 
 @Configuration
 @EnableWebFluxSecurity
@@ -30,13 +30,15 @@ class SecurityConfig {
     @Bean
     fun configure(http: ServerHttpSecurity,
                   resolver: ServerOAuth2AuthorizationRequestResolver,
-                  authManager: ReactiveAuthenticationManager
-    ): SecurityWebFilterChain {
-        return http.authorizeExchange()
+                  authManager: ReactiveAuthenticationManager): SecurityWebFilterChain {
+        return http
+                .authorizeExchange()
                 .anyExchange().authenticated()
-                .and().oauth2Login()
-                .authenticationManager(authManager)
-                .and().addFilterAt(OAuth2AuthorizationRequestRedirectWebFilter(resolver), SecurityWebFiltersOrder.FIRST)
+                .and()
+                .oauth2Login().authenticationManager(authManager)
+                .and()
+                .addFilterAt(corsFilter(), SecurityWebFiltersOrder.CORS)
+                .addFilterAt(OAuth2AuthorizationRequestRedirectWebFilter(resolver), SecurityWebFiltersOrder.FIRST)
                 //TODO: enable CSRF protection
                 .csrf().disable()
                 .build()
@@ -68,14 +70,19 @@ class SecurityConfig {
         })
     }
 
-    // Turn off CORS
-    @Bean
-    fun corsConfigurer(): WebFluxConfigurer {
-        return object : WebFluxConfigurerComposite() {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
-            }
-        }
+    fun corsFilter(): CorsWebFilter {
+        val corsConfig = CorsConfiguration()
+        corsConfig.allowedOrigins = Arrays.asList("http://allowed-origin.com")
+        corsConfig.maxAge = 8000L
+        corsConfig.addAllowedMethod("PUT")
+        corsConfig.addAllowedMethod("POST")
+        corsConfig.addAllowedMethod("GET")
+        corsConfig.addAllowedMethod("OPTIONS")
+        corsConfig.addAllowedHeader("VK-Allowed")
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", corsConfig)
+
+        return CorsWebFilter(source)
     }
 }

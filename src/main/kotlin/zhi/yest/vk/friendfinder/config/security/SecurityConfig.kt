@@ -40,8 +40,6 @@ class SecurityConfig {
                 .and()
                 .addFilterAt(corsFilter(), SecurityWebFiltersOrder.CORS)
                 .addFilterAt(OAuth2AuthorizationRequestRedirectWebFilter(resolver), SecurityWebFiltersOrder.FIRST)
-                //TODO: enable CSRF protection
-                .csrf().disable()
                 .build()
     }
 

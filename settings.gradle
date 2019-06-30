@@ -4,5 +4,6 @@ pluginManagement {
     }
 }
 rootProject.name = 'community-scanner'
-include 'config-server'
-include 'discovery-server'
+include 'config-service'
+include 'discovery-service'
+include 'people-service'

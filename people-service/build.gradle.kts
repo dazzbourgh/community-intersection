@@ -12,7 +12,6 @@ plugins {
     id("com.google.cloud.tools.jib") version "1.0.1"
 }
 
-
 group = "zhi.yest.community-intersection"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -32,8 +31,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-hystrix")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-ribbon")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
-//    implementation("org.springframework.security:spring-security-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-oauth2-client")
     compileOnly("javax.servlet:javax.servlet-api:4.0.1")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -49,7 +48,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-
 }
 
 dependencyManagement {

@@ -1,9 +1,0 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-    }
-}
-rootProject.name = 'community-scanner'
-include 'config-service'
-include 'discovery-service'
-include 'people-service'

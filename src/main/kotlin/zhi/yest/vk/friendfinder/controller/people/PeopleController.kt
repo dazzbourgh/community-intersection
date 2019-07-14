@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.reactive.publish
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,6 +19,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 @ExperimentalCoroutinesApi
 @RestController
 @RequestMapping("people")
+@CrossOrigin(value = ["*"],
+        allowedHeaders = ["*"],
+        maxAge = 3600)
 class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
     private val scope = CoroutineScope(EmptyCoroutineContext)

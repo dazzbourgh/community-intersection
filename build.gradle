@@ -20,7 +20,6 @@ sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven { url "http://dl.bintray.com/spekframework/spek" }
 }
 
@@ -35,7 +34,6 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: "$coroutines_version"
     implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-reactive', version: "$coroutines_version"
-    implementation 'zhi.yest:vk-method-executor:1.0.2'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.+"

@@ -57,7 +57,7 @@ class SecurityConfig {
                     .map {
                         DefaultOAuth2User(
                                 mutableListOf(OAuth2UserAuthority(mutableMapOf("some" to "attribute" as Any))),
-                                mutableMapOf("id" to it.id,
+                                mutableMapOf<String, Any>("id" to it.id,
                                         "firstName" to it.firstName,
                                         "lastName" to it.lastName,
                                         "fullName" to "${it.firstName} ${it.lastName}",

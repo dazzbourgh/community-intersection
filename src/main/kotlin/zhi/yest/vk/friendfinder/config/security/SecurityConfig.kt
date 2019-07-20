@@ -35,6 +35,8 @@ class SecurityConfig {
                 .oauth2Login().authenticationManager(authManager)
                 .and()
                 .addFilterAt(OAuth2AuthorizationRequestRedirectWebFilter(resolver), SecurityWebFiltersOrder.FIRST)
+                //TODO: enable CSRF protection
+                .csrf().disable()
                 .build()
     }
 

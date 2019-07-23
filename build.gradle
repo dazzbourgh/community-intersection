@@ -41,6 +41,8 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
     testRuntimeOnly "org.spekframework.spek2:spek-runner-junit5:$spek_version"
+    testImplementation "io.projectreactor:reactor-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
     
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }

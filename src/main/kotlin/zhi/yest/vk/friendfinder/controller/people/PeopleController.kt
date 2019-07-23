@@ -19,9 +19,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 @ExperimentalCoroutinesApi
 @RestController
 @RequestMapping("people")
-@CrossOrigin(value = ["*"],
-        allowedHeaders = ["*"],
-        maxAge = 3600)
 class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
     private val scope = CoroutineScope(EmptyCoroutineContext)

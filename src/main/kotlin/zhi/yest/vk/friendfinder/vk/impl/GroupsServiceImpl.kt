@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import zhi.yest.vk.friendfinder.config.security.dto.VkException
 import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
 import zhi.yest.vk.friendfinder.config.security.vkApiFilter
 import zhi.yest.vk.friendfinder.domain.Group
@@ -29,6 +30,12 @@ class GroupsServiceImpl(@Value("\${vk.api.version}")
                     }
                     .exchange()
                     .flatMap { it.bodyToMono<VkResponse<Group>>() }
-                    .map { it.response[0] }
+                    .map {
+                        when {
+                            it.error != null -> throw VkException("Group not found", it.error)
+                            it.response != null -> it.response[0]
+                            else -> throw VkException("Unsupported VK response", null)
+                        }
+                    }
                     .awaitSingle()
 }

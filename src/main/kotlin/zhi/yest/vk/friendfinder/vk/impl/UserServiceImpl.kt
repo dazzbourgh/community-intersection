@@ -34,6 +34,6 @@ class UserServiceImpl(@Value("\${vk.api.version}")
                     }
                     .exchange()
                     .flatMap { it.bodyToMono<VkResponse<User>>() }
-                    .map { it.response }
+                    .map { it.response!! }
                     .awaitSingle()
 }

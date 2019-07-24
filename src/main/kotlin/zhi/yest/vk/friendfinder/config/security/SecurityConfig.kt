@@ -53,7 +53,7 @@ class SecurityConfig {
                     )
                     .exchange()
                     .flatMap { it.bodyToFlux<VkResponse<VkUserInfo>>().toMono() }
-                    .map { it.response[0] }
+                    .map { it.response!![0] }
                     .map {
                         DefaultOAuth2User(
                                 mutableListOf(OAuth2UserAuthority(mutableMapOf("some" to "attribute" as Any))),

@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
 import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
 import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
+import zhi.yest.vk.friendfinder.filter.VkExchangeFilterFunction
 
 @Configuration
 @EnableWebFluxSecurity
@@ -65,5 +66,12 @@ class SecurityConfig {
                                 "fullName")
                     }
         })
+    }
+
+    @Bean
+    fun webClient(vkExchangeFilterFunction: VkExchangeFilterFunction): WebClient {
+        return WebClient.builder()
+                .filter(vkExchangeFilterFunction)
+                .build()
     }
 }

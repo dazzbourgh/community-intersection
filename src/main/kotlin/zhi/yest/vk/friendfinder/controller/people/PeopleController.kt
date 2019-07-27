@@ -1,30 +1,22 @@
 package zhi.yest.vk.friendfinder.controller.people
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.reactive.publish
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
 import zhi.yest.vk.friendfinder.domain.Request
 import zhi.yest.vk.friendfinder.vk.DelayingRequestSender
 import zhi.yest.vk.friendfinder.vk.UserService
-import kotlin.coroutines.EmptyCoroutineContext
 
 @ExperimentalCoroutinesApi
 @RestController
 @RequestMapping("people")
 class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
-    private val scope = CoroutineScope(EmptyCoroutineContext)
 
     @PostMapping(produces = ["application/stream+json"])
-    fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) = scope.publish {
+    fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) = publish {
         request.groupIds
                 .flatMap {
                     delayingRequestSender.request {

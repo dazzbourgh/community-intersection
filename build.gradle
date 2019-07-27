@@ -7,7 +7,7 @@ buildscript {
         spek_version = "2.0.2"
     }
     repositories {
-        maven {url "http://repo.spring.io/milestone"}
+        maven { url "http://repo.spring.io/milestone" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")

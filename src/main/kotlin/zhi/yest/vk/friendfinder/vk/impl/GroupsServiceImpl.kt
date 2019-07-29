@@ -2,7 +2,7 @@ package zhi.yest.vk.friendfinder.vk.impl
 
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -15,9 +15,10 @@ import zhi.yest.vk.friendfinder.vk.GroupsService
 @Service
 class GroupsServiceImpl(@Value("\${vk.api.version}")
                         private val vkApiVersion: String) : GroupsService {
-    override suspend fun findById(groupId: String, oAuth2User: OAuth2User): Group =
+
+    override suspend fun findById(groupId: String, token: OAuth2AuthenticationToken): Group =
             WebClient.builder()
-                    .filter(vkApiFilter(oAuth2User, vkApiVersion))
+                    .filter(vkApiFilter(token.principal, vkApiVersion))
                     .build()
                     .get()
                     .uri { builder ->

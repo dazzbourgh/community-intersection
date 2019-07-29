@@ -15,8 +15,8 @@ class GroupsController(private val groupsService: GroupsService,
                        private val delayingRequestSender: DelayingRequestSender) {
 
     @GetMapping("/{id}")
-    suspend fun getGroupInfo(@PathVariable("id") groupId: String, authentication: OAuth2AuthenticationToken): Group =
+    suspend fun getGroupInfo(@PathVariable("id") groupId: String, token: OAuth2AuthenticationToken): Group =
             delayingRequestSender.request {
-                groupsService.findById(groupId, authentication.principal)
+                groupsService.findById(groupId, token)
             }
 }

@@ -27,11 +27,11 @@ class PeopleController(private val userService: UserService,
     private val scope = CoroutineScope(EmptyCoroutineContext)
 
     @PostMapping(produces = ["application/stream+json"])
-    fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) = scope.publish {
+    fun findInteresting(@RequestBody request: Request) = scope.publish {
         request.groupIds
                 .flatMap {
                     delayingRequestSender.request {
-                        userService.search(it, request.fields, authentication.principal)
+                        userService.search(it, request.fields)
                     }
                 }
                 .groupingBy { it }

@@ -1,6 +1,7 @@
 package zhi.yest.vk.friendfinder.config.security
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,6 +29,8 @@ import zhi.yest.vk.friendfinder.filter.VkExchangeFilterFunction
 @Configuration
 @EnableWebFluxSecurity
 class SecurityConfig {
+
+    @ConditionalOnMissingBean
     @Bean
     fun configure(http: ServerHttpSecurity,
                   resolver: ServerOAuth2AuthorizationRequestResolver,
@@ -44,6 +47,7 @@ class SecurityConfig {
                 .build()
     }
 
+    @ConditionalOnMissingBean
     @Bean
     fun authManager(vkCodeTokenResponseClient: VkCodeTokenResponseClient,
                     clientProperties: OAuth2ClientProperties,
@@ -58,7 +62,7 @@ class SecurityConfig {
                     )
                     .exchange()
                     .flatMap { it.bodyToFlux<VkResponse<VkUserInfo>>().toMono() }
-                    .map { it.response[0] }
+                    .map { it.response!![0] }
                     .map {
                         DefaultOAuth2User(
                                 mutableListOf(OAuth2UserAuthority(mutableMapOf("some" to "attribute" as Any))),

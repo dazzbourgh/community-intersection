@@ -1,6 +1,8 @@
 package zhi.yest.vk.friendfinder.vk.impl
 
 import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -9,7 +11,8 @@ import zhi.yest.vk.friendfinder.domain.User
 import zhi.yest.vk.friendfinder.vk.UserService
 
 @Service
-class UserServiceImpl(private val webClient: WebClient) : UserService {
+class UserServiceImpl(@Value("\${vk.api.version}")
+                      private val vkApiVersion: String) : UserService {
     override suspend fun search(groupId: String,
                                 fields: Map<String, String>): List<User> =
             webClient.get()
@@ -26,6 +29,6 @@ class UserServiceImpl(private val webClient: WebClient) : UserService {
                     }
                     .exchange()
                     .flatMap { it.bodyToMono<VkResponse<User>>() }
-                    .map { it.response }
+                    .map { it.response!! }
                     .awaitSingle()
 }

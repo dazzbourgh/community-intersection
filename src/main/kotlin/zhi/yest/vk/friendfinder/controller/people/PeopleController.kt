@@ -23,7 +23,7 @@ class PeopleController(private val userService: UserService,
             request.groupIds
                     .flatMap {
                         delayingRequestSender.request {
-                            userService.search(it, request.fields, authentication)
+                            userService.search(it, request.fields)
                         }
                     }
                     .asSequence()

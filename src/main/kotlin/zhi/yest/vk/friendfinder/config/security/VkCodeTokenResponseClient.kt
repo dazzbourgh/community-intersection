@@ -16,7 +16,8 @@ import zhi.yest.vk.friendfinder.config.security.dto.VkOAuth2AccessTokenResponse
 class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registration.vk.client-id}")
                                 private val clientId: String,
                                 @Value("\${spring.security.oauth2.client.registration.vk.client-secret}")
-                                private val clientSecret: String) : ReactiveOAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
+                                private val clientSecret: String,
+                                private val webClient: WebClient) : ReactiveOAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
     override fun getTokenResponse(authorizationGrantRequest: OAuth2AuthorizationCodeGrantRequest): Mono<OAuth2AccessTokenResponse> {
         return Mono.defer {
             val clientRegistration = authorizationGrantRequest.clientRegistration
@@ -32,7 +33,7 @@ class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registr
                             .map { "${it.key}=${it.value}" }
                             .joinToString(separator = "&", prefix = "?")
 
-            WebClient.create().get()
+            webClient.get()
                     .uri(tokenUri)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()

@@ -9,9 +9,12 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginReactiveAuthenticationManager
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.security.oauth2.client.web.server.OAuth2AuthorizationRequestRedirectWebFilter
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver
+import org.springframework.security.oauth2.client.web.server.UnAuthenticatedServerOAuth2AuthorizedClientRepository
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -45,9 +48,10 @@ class SecurityConfig {
     fun authManager(vkCodeTokenResponseClient: VkCodeTokenResponseClient,
                     clientProperties: OAuth2ClientProperties,
                     @Value("\${vk.api.version}")
-                    vkApiVersion: String): ReactiveAuthenticationManager {
+                    vkApiVersion: String,
+                    webClient: WebClient): ReactiveAuthenticationManager {
         return OAuth2LoginReactiveAuthenticationManager(vkCodeTokenResponseClient, ReactiveOAuth2UserService { oAuth2UserRequest ->
-            WebClient.create().get()
+            webClient.get()
                     .uri(clientProperties.provider["vk"]
                             ?.userInfoUri!!
                             + "?access_token=${oAuth2UserRequest.accessToken.tokenValue}&v=$vkApiVersion"
@@ -69,9 +73,13 @@ class SecurityConfig {
     }
 
     @Bean
-    fun webClient(vkExchangeFilterFunction: VkExchangeFilterFunction): WebClient {
+    fun webClient(vkExchangeFilterFunction: VkExchangeFilterFunction,
+                  clientRegistrations: ReactiveClientRegistrationRepository): WebClient {
+        val oauth = ServerOAuth2AuthorizedClientExchangeFilterFunction(
+                clientRegistrations,
+                UnAuthenticatedServerOAuth2AuthorizedClientRepository())
         return WebClient.builder()
-                .filter(vkExchangeFilterFunction)
+                .filter(oauth)
                 .build()
     }
 }

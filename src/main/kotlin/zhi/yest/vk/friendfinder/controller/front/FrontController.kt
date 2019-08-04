@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,8 +12,7 @@ import reactor.core.publisher.Mono
 
 @Controller
 @RequestMapping("index")
-class FrontController(@Value("\${vk.front.end.link}") val frontEndLink: String,
-                      val clientRegistrationRepository: ReactiveClientRegistrationRepository) {
+class FrontController(@Value("\${vk.front.end.link}") val frontEndLink: String) {
     @GetMapping
     fun index(oAuth2AuthenticationToken: OAuth2AuthenticationToken,
               exchange: ServerWebExchange): Mono<Void> {

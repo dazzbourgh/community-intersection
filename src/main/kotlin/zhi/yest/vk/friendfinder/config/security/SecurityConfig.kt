@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserSer
 import org.springframework.security.oauth2.client.web.server.OAuth2AuthorizationRequestRedirectWebFilter
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
-import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.function.client.WebClient
@@ -66,7 +65,7 @@ class SecurityConfig {
                                         "lastName" to it.lastName,
                                         "fullName" to "${it.firstName} ${it.lastName}",
                                         "token" to oAuth2UserRequest.accessToken.tokenValue),
-                                "fullName") as OAuth2User
+                                "fullName")
                     }
         })
     }

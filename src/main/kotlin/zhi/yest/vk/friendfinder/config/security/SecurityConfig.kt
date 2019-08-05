@@ -1,7 +1,6 @@
 package zhi.yest.vk.friendfinder.config.security
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,12 +20,12 @@ import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
 import zhi.yest.vk.friendfinder.config.security.dto.VkResponse
 import zhi.yest.vk.friendfinder.config.security.dto.VkUserInfo
+import zhi.yest.vk.friendfinder.filter.VkExchangeFilterFunction
 
 @Configuration
 @EnableWebFluxSecurity
 class SecurityConfig {
 
-    @ConditionalOnMissingBean
     @Bean
     fun configure(http: ServerHttpSecurity,
                   resolver: ServerOAuth2AuthorizationRequestResolver,
@@ -43,7 +42,6 @@ class SecurityConfig {
                 .build()
     }
 
-    @ConditionalOnMissingBean
     @Bean
     fun authManager(vkCodeTokenResponseClient: VkCodeTokenResponseClient,
                     clientProperties: OAuth2ClientProperties,
@@ -60,6 +58,7 @@ class SecurityConfig {
                     .map { it.response!![0] }
                     .map {
                         DefaultOAuth2User(
+                                //TODO: figure out the purpose of the attributes for OAuth2UserAuthority
                                 mutableListOf(OAuth2UserAuthority(mutableMapOf("some" to "attribute" as Any))),
                                 mutableMapOf<String, Any>("id" to it.id,
                                         "firstName" to it.firstName,
@@ -69,5 +68,12 @@ class SecurityConfig {
                                 "fullName")
                     }
         })
+    }
+
+    @Bean
+    fun vkWebClient(vkExchangeFilterFunction: VkExchangeFilterFunction): WebClient {
+        return WebClient.builder()
+                .filter(vkExchangeFilterFunction)
+                .build()
     }
 }

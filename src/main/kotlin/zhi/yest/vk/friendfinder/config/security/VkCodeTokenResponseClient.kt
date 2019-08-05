@@ -32,7 +32,8 @@ class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registr
                             .map { "${it.key}=${it.value}" }
                             .joinToString(separator = "&", prefix = "?")
 
-            WebClient.create().get()
+            WebClient.create()
+                    .get()
                     .uri(tokenUri)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()

@@ -19,11 +19,11 @@ class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
 
     @PostMapping
-    suspend fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) =
+    suspend fun findInteresting(@RequestBody request: Request) =
             request.groupIds
                     .flatMap {
                         delayingRequestSender.request {
-                            userService.search(it, request.fields, authentication)
+                            userService.search(it, request.fields)
                         }
                     }
                     .asSequence()

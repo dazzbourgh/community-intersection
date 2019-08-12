@@ -16,7 +16,9 @@ To run from IDE, run CommunityScannerApplication class with the following JVM ar
 For actual values of client_id & client_secret refer to repo owner.
 
 ####As docker container
-Run the following command from app source root to build an image:
+[Set up](https://github.com/GoogleContainerTools/jib/blob/master/docs/configure-gcp-credentials.md) Docker credential helper and login to it to access GCR.
+
+Run the following command from app source root to build an image and push it to GCR:
 
 **./gradlew jib**
 

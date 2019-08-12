@@ -79,7 +79,7 @@ compileTestKotlin {
 
 jib {
     to {
-        image = 'dazzbourgh/friend-finder'
+        image = 'gcr.io/community-intersection/friend-finder'
         tags = ['latest']
     }
     container {

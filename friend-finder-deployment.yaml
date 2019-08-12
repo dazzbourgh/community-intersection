@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friend-finder
+  labels:
+    run: friend-finder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: friend-finder
+  template:
+    metadata:
+      labels:
+        run: friend-finder
+    spec:
+      containers:
+      - name: friend-finder
+        image: gcr.io/community-intersection/friend-finder:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: client_id
+          value: <client_id>
+        - name: client_secret
+          value: <client_secret>
+        - name: base-url
+          value: http://35.228.225.65:8080
+        - name: vk.front.end.link
+          value: http://localhost:4200

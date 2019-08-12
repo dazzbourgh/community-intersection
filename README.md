@@ -26,6 +26,12 @@ Use the same JVM args on container startup:
 
 **-Dspring.profiles.active=local -Dclient_id=___ -Dclient_secret=___**
 
+## Deploy on GCP
+
+1. `./gradlew jib` to build and push the latest image
+2. Put real <client_id> and <client_secret> to friend-finder-deployment.yaml (to be extracted to Cloud Config Server)
+3. `kubectl apply -f friend-finder-deployment.yaml` to apply latest image
+
 ## Implementation details
 
 `PeopleController` provides API for client application to get a stream (list) of users that are subscribed to all communities specified in the `Request` object, passed as body in POST request.

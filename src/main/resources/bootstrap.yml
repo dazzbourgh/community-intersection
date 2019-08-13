@@ -1,0 +1,4 @@
+spring.cloud.gcp.config:
+  enabled: true
+  name: community-intersection
+  profile: prod

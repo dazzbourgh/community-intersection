@@ -20,10 +20,8 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: client_id
-          value: <client_id>
-        - name: client_secret
-          value: <client_secret>
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
         - name: base-url
           value: http://35.228.225.65:8080
         - name: vk.front.end.link

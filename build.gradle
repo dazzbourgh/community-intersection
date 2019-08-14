@@ -6,9 +6,11 @@ buildscript {
         spek_version = "2.0.2"
     }
     repositories {
+        mavenCentral()
         maven { url "http://repo.spring.io/milestone" }
     }
     dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.8.RELEASE"
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
     }
 }
@@ -27,7 +29,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 ext {
-    springCloudVersion = "Greenwich.SR2"
+    springCloudVersion = "Hoxton.M1"
 }
 
 dependencyManagement {

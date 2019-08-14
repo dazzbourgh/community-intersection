@@ -11,7 +11,7 @@ For UI and an example please refer to [UI project page](https://github.com/dazzb
 ####From IDE
 To run from IDE, run CommunityScannerApplication class with the following JVM args:
 
-**-Dspring.profiles.active=local -Dclient_id=___ -Dclient_secret=___**
+**-Dspring.profiles.active=local -Dspring.cloud.gcp.config.enabled=false -Dclient_id=___ -Dclient_secret=___**
 
 For actual values of client_id & client_secret refer to repo owner.
 

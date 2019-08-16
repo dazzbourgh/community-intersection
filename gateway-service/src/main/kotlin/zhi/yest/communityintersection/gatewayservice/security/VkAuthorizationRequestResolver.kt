@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.gatewayservice
+package zhi.yest.communityintersection.gatewayservice.security
 
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2AuthorizationRequestResolver

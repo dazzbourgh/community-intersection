@@ -10,7 +10,7 @@ import zhi.yest.vk.friendfinder.service.vk.DelayingRequestSender
 import zhi.yest.vk.friendfinder.service.vk.GroupsService
 
 @RestController
-@RequestMapping("groups")
+@RequestMapping("v1/groups")
 class GroupsController(private val groupsService: GroupsService,
                        private val delayingRequestSender: DelayingRequestSender) {
 

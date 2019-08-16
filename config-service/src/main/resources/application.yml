@@ -7,10 +7,3 @@ spring:
       server:
         git:
           uri: file://${user.home}/IdeaProjects/vk-community-intersection-config
-
-eureka:
-  client:
-    region: default
-    registryFetchIntervalSeconds: 5
-    serviceUrl:
-      defaultZone: http://localhost:9092/eureka/

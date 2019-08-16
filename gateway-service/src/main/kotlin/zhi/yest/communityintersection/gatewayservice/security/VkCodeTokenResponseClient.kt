@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.gatewayservice
+package zhi.yest.communityintersection.gatewayservice.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import zhi.yest.communityintersection.gatewayservice.dto.VkOAuth2AccessTokenResponse
 
 @Component
 class VkCodeTokenResponseClient(@Value("\${spring.security.oauth2.client.registration.vk.client-id}")

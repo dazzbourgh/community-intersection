@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.gatewayservice
+package zhi.yest.communityintersection.gatewayservice.dto
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty

@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.gatewayservice
+package zhi.yest.communityintersection.gatewayservice.security.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
@@ -19,6 +19,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
+import zhi.yest.communityintersection.gatewayservice.security.VkCodeTokenResponseClient
+import zhi.yest.communityintersection.gatewayservice.dto.VkResponse
+import zhi.yest.communityintersection.gatewayservice.dto.VkUserInfo
 
 @Configuration
 @EnableWebFluxSecurity

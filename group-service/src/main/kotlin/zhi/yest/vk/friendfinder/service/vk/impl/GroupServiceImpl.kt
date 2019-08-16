@@ -9,11 +9,11 @@ import zhi.yest.vk.friendfinder.domain.Group
 import zhi.yest.vk.friendfinder.dto.VkException
 import zhi.yest.vk.friendfinder.dto.VkResponse
 import zhi.yest.vk.friendfinder.filter.vkApiFilter
-import zhi.yest.vk.friendfinder.service.vk.GroupsService
+import zhi.yest.vk.friendfinder.service.vk.GroupService
 
 @Service
-class GroupsServiceImpl(@Value("\${vk.api.version}")
-                        private val vkApiVersion: String) : GroupsService {
+class GroupServiceImpl(@Value("\${vk.api.version}")
+                        private val vkApiVersion: String) : GroupService {
 
     override suspend fun findById(groupId: String, token: String): Group =
             WebClient.builder()

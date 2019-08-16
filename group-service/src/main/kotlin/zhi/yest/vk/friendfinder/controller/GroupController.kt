@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import zhi.yest.vk.friendfinder.domain.Group
 import zhi.yest.vk.friendfinder.service.vk.DelayingRequestSender
-import zhi.yest.vk.friendfinder.service.vk.GroupsService
+import zhi.yest.vk.friendfinder.service.vk.GroupService
 
 @RestController
-@RequestMapping("v1/groups")
-class GroupsController(private val groupsService: GroupsService,
-                       private val delayingRequestSender: DelayingRequestSender) {
+@RequestMapping("v1/group")
+class GroupController(private val groupService: GroupService,
+                      private val delayingRequestSender: DelayingRequestSender) {
 
     @GetMapping("/{id}")
     suspend fun getGroupInfo(@PathVariable("id") groupId: String, jwt: Jwt): Group =
             delayingRequestSender.request {
-                groupsService.findById(groupId, jwt.tokenValue)
+                groupService.findById(groupId, jwt.tokenValue)
             }
 }

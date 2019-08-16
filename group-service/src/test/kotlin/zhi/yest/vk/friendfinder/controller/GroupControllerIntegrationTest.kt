@@ -19,18 +19,18 @@ import reactor.test.StepVerifier
 import zhi.yest.vk.friendfinder.domain.Group
 import zhi.yest.vk.friendfinder.dto.VkError
 import zhi.yest.vk.friendfinder.dto.VkException
-import zhi.yest.vk.friendfinder.service.vk.GroupsService
+import zhi.yest.vk.friendfinder.service.vk.GroupService
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class GroupsControllerIntegrationTest {
+class GroupControllerIntegrationTest {
 
     @Autowired
     lateinit var context: ApplicationContext
     lateinit var webTestClient: WebTestClient
     @MockBean
-    lateinit var groupsService: GroupsService
+    lateinit var groupService: GroupService
 
     @BeforeEach
     fun init() {
@@ -41,7 +41,7 @@ class GroupsControllerIntegrationTest {
     @Test
     fun getGroupInfo_groupExists_returnsGroup() {
         runBlocking {
-            given(groupsService.findById(eq("123"), anyOrNull()))
+            given(groupService.findById(eq("123"), anyOrNull()))
                     .willReturn(Group(123, "name", "screenName", false, "group",
                             false, false, false,
                             "description", null, null, null))
@@ -59,7 +59,7 @@ class GroupsControllerIntegrationTest {
     @Test
     fun getGroupInfo_groupDoesNotExists_returns404() {
         runBlocking {
-            given(groupsService.findById(eq("123"), anyOrNull()))
+            given(groupService.findById(eq("123"), anyOrNull()))
                     .willThrow(VkException("Group not found", VkError(100, "not found")))
 
             val body = webTestClient.get().uri("/groups/123")
@@ -78,7 +78,7 @@ class GroupsControllerIntegrationTest {
     @Test
     fun getGroupInfo_unknownError_returns500() {
         runBlocking {
-            given(groupsService.findById(eq("123"), anyOrNull())).willThrow(VkException("Unknown", null))
+            given(groupService.findById(eq("123"), anyOrNull())).willThrow(VkException("Unknown", null))
 
             val body = webTestClient.get().uri("/groups/123")
                     .accept(APPLICATION_JSON)

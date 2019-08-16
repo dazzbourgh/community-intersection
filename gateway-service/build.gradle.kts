@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
     kotlin("jvm") version "1.3.41"
     kotlin("plugin.spring") version "1.3.41"
+    id("com.google.cloud.tools.jib") version "1.3.0"
 }
 
 group = "zhi.yest.community-intersection"
@@ -44,5 +45,17 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "1.8"
+    }
+}
+
+jib {
+    to {
+        image = "dazzbourgh/friend-finder/gateway-service"
+        tags = setOf("latest")
+    }
+    container {
+        jvmFlags = listOf("-XX:+UnlockExperimentalVMOptions",
+                "-XX:+UseCGroupMemoryLimitForHeap",
+                "-XX:MaxRAMFraction=1")
     }
 }

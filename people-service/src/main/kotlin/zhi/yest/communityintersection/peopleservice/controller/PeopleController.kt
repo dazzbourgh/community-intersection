@@ -1,40 +1,37 @@
-package zhi.yest.communityintersection.peopleservice.people
+package zhi.yest.communityintersection.peopleservice.controller
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.reactive.publish
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import zhi.yest.communityintersection.peopleservice.domain.Request
-import zhi.yest.communityintersection.peopleservice.security.dto.VkUserInfo
+import zhi.yest.communityintersection.peopleservice.dto.VkUserInfo
 import zhi.yest.communityintersection.peopleservice.vk.DelayingRequestSender
 import zhi.yest.communityintersection.peopleservice.vk.UserService
-import kotlin.coroutines.EmptyCoroutineContext
 
 @ExperimentalCoroutinesApi
 @RestController
-@RequestMapping("people")
+@RequestMapping("v1/people")
 class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
-    private val scope = CoroutineScope(EmptyCoroutineContext)
 
-    @PostMapping(produces = ["application/stream+json"])
-    fun findInteresting(@RequestBody request: Request, authentication: OAuth2AuthenticationToken) = scope.publish {
-        request.groupIds
-                .flatMap {
-                    delayingRequestSender.request {
-                        userService.search(it, request.fields, authentication.principal)
+    @PostMapping
+    suspend fun findInteresting(@RequestBody request: Request, authentication: OAuth2User) =
+            request.groupIds
+                    .flatMap {
+                        delayingRequestSender.request {
+                            userService.search(it, request.fields, authentication)
+                        }
                     }
-                }
-                .groupingBy { it }
-                .eachCount()
-                .filter { it.value == request.groupIds.size }
-                .forEach { (user, _) -> send(user) }
-    }
+                    .asSequence()
+                    .groupingBy { it }
+                    .eachCount()
+                    .filter { it.value == request.groupIds.size }
+                    .map { it.key }
 
     @GetMapping("me")
     fun me(authentication: OAuth2AuthenticationToken): VkUserInfo {

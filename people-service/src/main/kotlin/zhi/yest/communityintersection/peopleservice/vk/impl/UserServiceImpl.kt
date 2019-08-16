@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import zhi.yest.communityintersection.peopleservice.domain.User
-import zhi.yest.communityintersection.peopleservice.security.dto.VkResponse
-import zhi.yest.communityintersection.peopleservice.security.vkApiFilter
+import zhi.yest.communityintersection.peopleservice.dto.VkResponse
+import zhi.yest.communityintersection.peopleservice.filter.vkApiFilter
 import zhi.yest.communityintersection.peopleservice.vk.UserService
 
 @Service
@@ -35,5 +35,5 @@ class UserServiceImpl(@Value("\${vk.api.version}")
                     .exchange()
                     .flatMap { it.bodyToMono<VkResponse<User>>() }
                     .map { it.response }
-                    .awaitSingle()
+                    .awaitSingle()!!
 }

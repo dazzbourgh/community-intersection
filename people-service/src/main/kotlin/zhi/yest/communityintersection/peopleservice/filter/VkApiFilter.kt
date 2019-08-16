@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.uaaservice.config.security
+package zhi.yest.communityintersection.peopleservice.filter
 
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.web.reactive.function.client.ClientRequest

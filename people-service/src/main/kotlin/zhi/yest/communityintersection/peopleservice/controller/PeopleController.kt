@@ -1,8 +1,7 @@
 package zhi.yest.communityintersection.peopleservice.controller
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,11 +19,11 @@ class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
 
     @PostMapping
-    suspend fun findInteresting(@RequestBody request: Request, authentication: OAuth2User) =
+    suspend fun findInteresting(@RequestBody request: Request, jwt: Jwt) =
             request.groupIds
                     .flatMap {
                         delayingRequestSender.request {
-                            userService.search(it, request.fields, authentication)
+                            userService.search(it, request.fields, jwt.tokenValue)
                         }
                     }
                     .asSequence()
@@ -34,10 +33,8 @@ class PeopleController(private val userService: UserService,
                     .map { it.key }
 
     @GetMapping("me")
-    fun me(authentication: OAuth2AuthenticationToken): VkUserInfo {
-        val attributes = authentication.principal.attributes
-        return VkUserInfo(attributes["id"] as Long,
-                attributes["firstName"] as String,
-                attributes["lastName"] as String)
+    fun me(jwt: Jwt): VkUserInfo {
+        val name = jwt.subject.split(" ").zipWithNext()[0]
+        return VkUserInfo(name.first, name.second)
     }
 }

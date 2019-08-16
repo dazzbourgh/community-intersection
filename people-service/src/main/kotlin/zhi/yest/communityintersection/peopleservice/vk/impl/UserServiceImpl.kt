@@ -2,7 +2,6 @@ package zhi.yest.communityintersection.peopleservice.vk.impl
 
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -16,9 +15,9 @@ class UserServiceImpl(@Value("\${vk.api.version}")
                       private val vkApiVersion: String) : UserService {
     override suspend fun search(groupId: String,
                                 fields: Map<String, String>,
-                                oAuth2User: OAuth2User): List<User> =
+                                token: String): List<User> =
             WebClient.builder()
-                    .filter(vkApiFilter(oAuth2User, vkApiVersion))
+                    .filter(vkApiFilter(token, vkApiVersion))
                     .build()
                     .get()
                     .uri { builder ->
@@ -35,5 +34,5 @@ class UserServiceImpl(@Value("\${vk.api.version}")
                     .exchange()
                     .flatMap { it.bodyToMono<VkResponse<User>>() }
                     .map { it.response }
-                    .awaitSingle()!!
+                    .awaitSingle()
 }

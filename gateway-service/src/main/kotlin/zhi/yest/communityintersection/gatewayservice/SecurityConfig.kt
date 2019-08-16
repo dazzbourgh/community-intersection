@@ -2,6 +2,7 @@ package zhi.yest.communityintersection.gatewayservice
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
+import org.springframework.cloud.security.oauth2.gateway.TokenRelayGatewayFilterFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.ReactiveAuthenticationManager
@@ -25,7 +26,9 @@ class SecurityConfig {
     @Bean
     fun configure(http: ServerHttpSecurity,
                   resolver: ServerOAuth2AuthorizationRequestResolver,
-                  authManager: ReactiveAuthenticationManager): SecurityWebFilterChain {
+                  authManager: ReactiveAuthenticationManager,
+                  filterFactory: TokenRelayGatewayFilterFactory): SecurityWebFilterChain {
+        // formatter:off
         return http
                 .authorizeExchange()
                 .anyExchange().authenticated()
@@ -36,6 +39,7 @@ class SecurityConfig {
                 //TODO: enable CSRF protection
                 .csrf().disable()
                 .build()
+        //formatter:on
     }
 
     @Bean

@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import zhi.yest.communityintersection.peopleservice.vk.DelayingRequestSender
-import zhi.yest.communityintersection.peopleservice.vk.impl.DelayingRequestSenderImpl
+import zhi.yest.communityintersection.peopleservice.service.vk.DelayingRequestSender
+import zhi.yest.communityintersection.peopleservice.service.vk.impl.DelayingRequestSenderImpl
 import kotlin.system.measureTimeMillis
 
 @ObsoleteCoroutinesApi

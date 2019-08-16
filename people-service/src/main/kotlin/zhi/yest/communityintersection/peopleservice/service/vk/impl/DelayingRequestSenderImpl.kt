@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.peopleservice.vk.impl
+package zhi.yest.communityintersection.peopleservice.service.vk.impl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -10,7 +10,7 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import zhi.yest.communityintersection.peopleservice.vk.DelayingRequestSender
+import zhi.yest.communityintersection.peopleservice.service.vk.DelayingRequestSender
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 

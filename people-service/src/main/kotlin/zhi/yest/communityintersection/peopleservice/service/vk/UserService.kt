@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.peopleservice.vk
+package zhi.yest.communityintersection.peopleservice.service.vk
 
 import zhi.yest.communityintersection.peopleservice.domain.User
 

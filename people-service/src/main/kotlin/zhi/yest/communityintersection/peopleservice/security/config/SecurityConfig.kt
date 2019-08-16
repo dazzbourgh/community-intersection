@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.peopleservice.config
+package zhi.yest.communityintersection.peopleservice.security.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -6,8 +6,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.web.server.WebFilter
-import zhi.yest.communityintersection.peopleservice.security.VkJwtDecoder
+import zhi.yest.communityintersection.peopleservice.security.jwt.VkJwtDecoder
 
 @Configuration
 @EnableWebFluxSecurity
@@ -20,7 +19,7 @@ class SecurityConfig {
                 .anyExchange()
                     .authenticated()
                 .and()
-                .addFilterAt(WebFilter { exchange, chain ->
+                .addFilterAt({ exchange, chain ->
                     exchange.request.headers.forEach { println(it) }
                     println()
                     chain.filter(exchange)

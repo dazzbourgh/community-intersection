@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import zhi.yest.communityintersection.peopleservice.domain.Request
 import zhi.yest.communityintersection.peopleservice.dto.VkUserInfo
-import zhi.yest.communityintersection.peopleservice.vk.DelayingRequestSender
-import zhi.yest.communityintersection.peopleservice.vk.UserService
+import zhi.yest.communityintersection.peopleservice.service.vk.DelayingRequestSender
+import zhi.yest.communityintersection.peopleservice.service.vk.UserService
 
 @ExperimentalCoroutinesApi
 @RestController

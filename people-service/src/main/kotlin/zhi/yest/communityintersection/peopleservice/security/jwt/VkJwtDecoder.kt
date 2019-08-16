@@ -1,4 +1,4 @@
-package zhi.yest.communityintersection.peopleservice.security
+package zhi.yest.communityintersection.peopleservice.security.jwt
 
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder

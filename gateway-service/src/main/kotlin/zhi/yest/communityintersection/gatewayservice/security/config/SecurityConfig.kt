@@ -31,18 +31,18 @@ class SecurityConfig {
                   resolver: ServerOAuth2AuthorizationRequestResolver,
                   authManager: ReactiveAuthenticationManager,
                   filterFactory: TokenRelayGatewayFilterFactory): SecurityWebFilterChain {
-        // formatter:off
+        // @formatter:off
         return http
                 .authorizeExchange()
-                .anyExchange().authenticated()
+                    .anyExchange().authenticated()
                 .and()
-                .oauth2Login().authenticationManager(authManager)
+                    .oauth2Login().authenticationManager(authManager)
                 .and()
                 .addFilterAt(OAuth2AuthorizationRequestRedirectWebFilter(resolver), SecurityWebFiltersOrder.FIRST)
                 //TODO: enable CSRF protection
                 .csrf().disable()
                 .build()
-        // formatter:on
+        // @formatter:on
     }
 
     @Bean

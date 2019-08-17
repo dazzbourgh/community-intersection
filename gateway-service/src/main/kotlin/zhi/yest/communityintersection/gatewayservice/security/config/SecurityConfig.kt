@@ -42,7 +42,7 @@ class SecurityConfig {
                 //TODO: enable CSRF protection
                 .csrf().disable()
                 .build()
-        //formatter:on
+        // formatter:on
     }
 
     @Bean

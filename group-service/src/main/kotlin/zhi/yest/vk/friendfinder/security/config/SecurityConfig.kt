@@ -26,6 +26,13 @@ class SecurityConfig {
                 .oauth2ResourceServer()
                     .jwt()
                         .jwtDecoder(VkJwtDecoder())
+//                    .jwtAuthenticationConverter {
+//                        Mono.just(BearerTokenAuthenticationToken(it.tokenValue))
+//                    }
+//                    .authenticationManager {
+//                        it.isAuthenticated = true
+//                        Mono.just(it)
+//                    }
         return http.build()
         // @formatter:on
     }

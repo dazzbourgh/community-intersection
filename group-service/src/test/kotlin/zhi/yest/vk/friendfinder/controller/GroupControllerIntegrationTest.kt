@@ -46,7 +46,7 @@ class GroupControllerIntegrationTest {
                             false, false, false,
                             "description", null, null, null))
 
-            webTestClient.get().uri("/groups/123")
+            webTestClient.get().uri("v1/group/123")
                     .accept(APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isOk

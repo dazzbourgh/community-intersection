@@ -6,15 +6,16 @@ val junitVersion = "5.2.0"
 
 buildscript {
     repositories {
-        maven(url = "https://repo.spring.io/milestone")
+        maven("http://repo.spring.io/milestone")
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.0.M5")
     }
 }
 
+apply(plugin = "org.springframework.boot")
+
 plugins {
-    id("org.springframework.boot") version "2.2.0.M5"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("jvm") version "1.3.41"
     kotlin("plugin.spring") version "1.3.41"
@@ -25,21 +26,25 @@ group = "zhi.yest.community-intersection"
 version = "0.0.1-SNAPSHOT"
 
 repositories {
-    mavenCentral()
-    maven(url = "http://dl.bintray.com/spekframework/spek")
     maven(url = "https://repo.spring.io/milestone")
+    maven(url = "http://dl.bintray.com/spekframework/spek")
+    mavenCentral()
 }
 
-extra["springCloudVersion"] = "Hoxton.M1"
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:Hoxton.M1")
+    }
+}
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$coroutinesVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("org.springframework:spring-core:5.2.0.M3")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
@@ -57,12 +62,6 @@ dependencies {
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
 }
 
 tasks.withType<KotlinCompile> {

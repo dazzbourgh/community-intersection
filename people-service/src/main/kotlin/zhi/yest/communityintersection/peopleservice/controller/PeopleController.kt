@@ -1,6 +1,7 @@
 package zhi.yest.communityintersection.peopleservice.controller
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +20,7 @@ class PeopleController(private val userService: UserService,
                        private val delayingRequestSender: DelayingRequestSender) {
 
     @PostMapping
-    suspend fun findInteresting(@RequestBody request: Request, jwt: Jwt) =
+    suspend fun findInteresting(@RequestBody request: Request, @AuthenticationPrincipal jwt: Jwt) =
             request.groupIds
                     .flatMap {
                         delayingRequestSender.request {
@@ -33,7 +34,7 @@ class PeopleController(private val userService: UserService,
                     .map { it.key }
 
     @GetMapping("me")
-    fun me(jwt: Jwt): VkUserInfo {
+    fun me(@AuthenticationPrincipal jwt: Jwt): VkUserInfo {
         val name = jwt.subject.split(" ").zipWithNext()[0]
         return VkUserInfo(name.first, name.second)
     }

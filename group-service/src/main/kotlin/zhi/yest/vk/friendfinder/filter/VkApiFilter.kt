@@ -10,6 +10,6 @@ fun vkApiFilter(token: String,
         ExchangeFilterFunction.ofRequestProcessor {
             val delimiter = if (it.url().toString().contains("?")) "&" else "?"
             Mono.just(ClientRequest.from(it)
-                    .url(URI("${it.url()}${delimiter}access_token=${token}&v=$vkApiVersion"))
+                    .url(URI("${it.url()}${delimiter}access_token=$token&v=$vkApiVersion"))
                     .build())
         }

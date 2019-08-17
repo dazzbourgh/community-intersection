@@ -79,7 +79,7 @@ tasks.withType<Test> {
 
 jib {
     to {
-        image = "dazzbourgh/friend-finder/people-service"
+        image = "dazzbourgh/friend-finder/group-service"
         tags = setOf("latest")
     }
     container {

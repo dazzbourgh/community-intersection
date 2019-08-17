@@ -2,9 +2,11 @@ package zhi.yest.communityintersection.gatewayservice.security.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
+import org.springframework.cloud.gateway.filter.GlobalFilter
 import org.springframework.cloud.security.oauth2.gateway.TokenRelayGatewayFilterFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
@@ -18,6 +20,7 @@ import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import zhi.yest.communityintersection.gatewayservice.dto.VkResponse
 import zhi.yest.communityintersection.gatewayservice.dto.VkUserInfo
@@ -43,6 +46,19 @@ class SecurityConfig {
                 .csrf().disable()
                 .build()
         // @formatter:on
+    }
+
+    // Spring Cloud Gateway for some reason removes the SESSION cookie via set-cookie header
+    // after a call to resource server. This filter allows to bypass this limitation.
+    @Bean
+    @Order(1)
+    fun cookieHeaderFilter(): GlobalFilter = GlobalFilter { exchange, chain ->
+        chain.filter(exchange)
+                .then(Mono.fromRunnable {
+                    if (exchange.response.headers["set-cookie"]?.get(0)?.contains("SESSION=;") == true) {
+                        exchange.response.headers.remove("set-cookie")
+                    }
+                })
     }
 
     @Bean

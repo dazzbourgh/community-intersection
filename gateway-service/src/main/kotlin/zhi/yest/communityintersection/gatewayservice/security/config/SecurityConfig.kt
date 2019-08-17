@@ -19,9 +19,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import reactor.core.publisher.toMono
-import zhi.yest.communityintersection.gatewayservice.security.VkCodeTokenResponseClient
 import zhi.yest.communityintersection.gatewayservice.dto.VkResponse
 import zhi.yest.communityintersection.gatewayservice.dto.VkUserInfo
+import zhi.yest.communityintersection.gatewayservice.security.VkCodeTokenResponseClient
 
 @Configuration
 @EnableWebFluxSecurity

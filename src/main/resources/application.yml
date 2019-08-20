@@ -6,6 +6,8 @@ vk:
   api:
     version: 5.95
 spring:
+  application.name: friend-finder
+  cloud.kubernetes.reload.enabled: true
   security:
     oauth2:
       client:

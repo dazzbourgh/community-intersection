@@ -11,7 +11,7 @@ For UI and an example please refer to [UI project page](https://github.com/dazzb
 ####From IDE
 To run from IDE, run CommunityScannerApplication class with the following JVM args:
 
-**-Dspring.profiles.active=local -Dclient_id=___ -Dclient_secret=___**
+**-Dspring.profiles.active=local -Dspring.cloud.gcp.config.enabled=false -Dclient_id=___ -Dclient_secret=___**
 
 For actual values of client_id & client_secret refer to repo owner.
 
@@ -26,6 +26,11 @@ Use the same JVM args on container startup:
 
 **-Dspring.profiles.active=local -Dclient_id=___ -Dclient_secret=___**
 
+## Deploy on GCP
+
+1. `./gradlew jib` to build and push the latest image
+2. `kubectl apply -f friend-finder-deployment.yaml` to apply latest image
+
 ## Implementation details
 
 `PeopleController` provides API for client application to get a stream (list) of users that are subscribed to all communities specified in the `Request` object, passed as body in POST request.
@@ -33,3 +38,13 @@ Use the same JVM args on container startup:
 Since VK doesn't allow sending request more than 3 times a second, `DelayingRequestSender` is a service that queues all the requests from this back end application to VK API and executes them after a delay if such is needed.
 
 `UserService` is responsible for fetching information about VK users.
+
+## GCP details
+ 
+ To setup on a new cluster run:
+ 
+ 1. `kubectl apply -f kubernetes/role.yaml` to grant permissions to pods in default namespace to read secrets and configmaps
+ 2. `kubectl apply -f kubernetes/secret.yaml` to create secrets. Put base64 encoded secrets.
+ 3. `kubectl apply -f kubernetes/config.yaml` to add configmap. Note: name of configmap must correspond to `spring.application.name`
+ 
+ When configs changed in runtime, changes should be automatically propagated to the apps.

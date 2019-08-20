@@ -20,9 +20,13 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: prod
-        - name: base-url
-          value: http://35.228.225.65:8080
-        - name: vk.front.end.link
-          value: http://localhost:4200
+        - name: client_id
+          valueFrom:
+            secretKeyRef:
+              name: friend-finder-secret
+              key: client_id
+        - name: client_secret
+          valueFrom:
+            secretKeyRef:
+              name: friend-finder-secret
+              key: client_secret

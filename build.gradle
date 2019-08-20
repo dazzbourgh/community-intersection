@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-client'
-    implementation "org.springframework.cloud:spring-cloud-gcp-starter-config"
+    implementation "org.springframework.cloud:spring-cloud-starter-kubernetes-all"
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
